@@ -460,6 +460,99 @@ button:disabled {
   color: var(--danger);
 }
 
+/* Card de agendamento (Agenda) */
+.agendamento-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.agendamento-topo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.agendamento-hora {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 7px 10px;
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.agendamento-cliente {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.agendamento-cliente strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.agendamento-rodape {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.status-badge {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--muted);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  padding: 5px 10px;
+  border-radius: var(--radius-full);
+}
+
+.status-mensal {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.agendamento-acoes {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-acao {
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 7px 12px;
+  border-radius: var(--radius-md);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.btn-acao-perigo {
+  color: var(--danger);
+  border-color: var(--danger);
+  background: transparent;
+}
+
+.agendamento-editar {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
 .btn-salvar-cliente {
   width: 100%;
 }

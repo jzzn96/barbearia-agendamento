@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { Agendamento } from '../services/api'
 import { buildReminderLink } from '../lib/whatsapp'
+import { formatPhoneDisplay } from '../lib/phone'
 import { PacoteCortes } from './PacoteCortes'
 
 export function AgendamentoCard({
@@ -27,44 +28,54 @@ export function AgendamentoCard({
   const restam = Math.max(0, agendamento.cortesPagosMes - agendamento.cortesUsadosMes)
 
   return (
-    <div className="card">
-      <div className="card-topo">
-        <strong>{agendamento.horario}</strong> {agendamento.nomeCliente}
+    <div className="card agendamento-card">
+      <div className="agendamento-topo">
+        <span className="agendamento-hora">{agendamento.horario}</span>
+        <div className="agendamento-cliente">
+          <strong>{agendamento.nomeCliente}</strong>
+          <span className="card-sub">
+            {formatPhoneDisplay(agendamento.telefoneCliente)} · {agendamento.servico} ({agendamento.duracaoMin} min)
+          </span>
+        </div>
         <a className="btn-lembrete" href={linkLembrete} target="_blank" rel="noreferrer">
           Lembrar 💬
         </a>
       </div>
-      <div className="card-sub">
-        {agendamento.telefoneCliente} · {agendamento.servico} ({agendamento.duracaoMin} min)
-      </div>
 
       {!editando && (
-        <div className="card-status">
-          {agendamento.clienteMensal ? <span>🔵 Mensal — restam {restam} cortes</span> : <span>Avulso</span>}
-          <button className="link" onClick={() => setEditando(true)}>
-            editar
-          </button>
-          <button className="link" onClick={() => onCancelar(agendamento.id)}>
-            cancelar
-          </button>
+        <div className="agendamento-rodape">
+          <span className={agendamento.clienteMensal ? 'status-badge status-mensal' : 'status-badge'}>
+            {agendamento.clienteMensal ? `Mensal · restam ${restam}` : 'Avulso'}
+          </span>
+          <div className="agendamento-acoes">
+            <button className="btn-acao" onClick={() => setEditando(true)}>
+              Editar
+            </button>
+            <button className="btn-acao btn-acao-perigo" onClick={() => onCancelar(agendamento.id)}>
+              Cancelar
+            </button>
+          </div>
         </div>
       )}
 
       {editando && (
-        <div className="card-status">
-          <label>
+        <div className="agendamento-editar">
+          <label className="toggle">
             <input type="checkbox" checked={mensal} onChange={(e) => setMensal(e.target.checked)} />
-            Mensal
+            <span className="toggle-track">
+              <span className="toggle-thumb" />
+            </span>
+            <span className="toggle-label">Cliente mensal</span>
           </label>
           {mensal && <PacoteCortes pagos={pagos} usados={usados} onChangePagos={setPagos} onChangeUsados={setUsados} />}
           <button
-            className="link"
+            className="btn-salvar-cliente"
             onClick={() => {
               onAtualizarStatus(agendamento.telefoneCliente, mensal, pagos, usados)
               setEditando(false)
             }}
           >
-            salvar
+            Salvar
           </button>
         </div>
       )}
