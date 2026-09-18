@@ -33,6 +33,10 @@ export default function BarberClients() {
 
   return (
     <div className="tela">
+      <div className="marca">
+        <div className="marca-avatar">B</div>
+        <span className="marca-nome">Barbearia</span>
+      </div>
       <div className="topo-painel">
         <h1>Clientes</h1>
         <Link to="/painel">Agenda</Link>

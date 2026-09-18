@@ -68,17 +68,35 @@ export default function Booking() {
   if (etapa === 'sucesso') {
     return (
       <div className="tela">
-        <h1>💈 Agendado!</h1>
-        <p>
-          Te esperamos dia {new Date(`${dataEscolhida}T00:00:00`).toLocaleDateString('pt-BR')} às {horarioEscolhido}.
-        </p>
+        <div className="marca">
+          <div className="marca-avatar">B</div>
+          <span className="marca-nome">Barbearia</span>
+        </div>
+        <div className="sucesso">
+          <div className="sucesso-icone">✓</div>
+          <h1>Agendado!</h1>
+          <p className="card-sub">
+            Te esperamos dia {new Date(`${dataEscolhida}T00:00:00`).toLocaleDateString('pt-BR')} às {horarioEscolhido}.
+          </p>
+        </div>
       </div>
     )
   }
 
   return (
     <div className="tela">
-      <h1>💈 Agende seu horário</h1>
+      <div className="marca">
+        <div className="marca-avatar">B</div>
+        <span className="marca-nome">Barbearia</span>
+      </div>
+
+      <div className="hero">
+        <div className="hero-avatar">💈</div>
+        <div>
+          <p className="hero-titulo">Agende seu horário</p>
+          <p className="hero-sub">Escolha o dia e o horário que preferir</p>
+        </div>
+      </div>
 
       <h2>Escolha o dia</h2>
       <div className="chips">
@@ -114,9 +132,12 @@ export default function Booking() {
 
       {(etapa === 'form' || etapa === 'enviando' || etapa === 'erro') && horarioEscolhido && (
         <div className="form">
-          <h2>Seus dados</h2>
-          <input placeholder="Nome" value={nome} onChange={(e) => setNome(e.target.value)} />
+          <h2 style={{ marginTop: 0 }}>Seus dados</h2>
+          <label htmlFor="campo-nome">Nome</label>
+          <input id="campo-nome" placeholder="Seu nome" value={nome} onChange={(e) => setNome(e.target.value)} />
+          <label htmlFor="campo-telefone">Telefone</label>
           <input
+            id="campo-telefone"
             placeholder="(11) 91234-5678"
             value={telefone}
             onChange={(e) => setTelefone(formatPhoneInput(e.target.value))}

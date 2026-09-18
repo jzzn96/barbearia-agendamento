@@ -26,12 +26,24 @@ export default function BarberLogin() {
 
   return (
     <div className="tela">
-      <h1>Área do barbeiro</h1>
+      <div className="marca">
+        <div className="marca-avatar">B</div>
+        <span className="marca-nome">Barbearia</span>
+      </div>
+      <div className="hero">
+        <div className="hero-avatar">🔒</div>
+        <div>
+          <p className="hero-titulo">Área do barbeiro</p>
+          <p className="hero-sub">Digite seu PIN pra ver a agenda</p>
+        </div>
+      </div>
       <div className="form">
+        <label htmlFor="campo-pin">PIN</label>
         <input
+          id="campo-pin"
           type="password"
           inputMode="numeric"
-          placeholder="PIN"
+          placeholder="••••"
           value={pin}
           onChange={(e) => setPin(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && entrar()}
