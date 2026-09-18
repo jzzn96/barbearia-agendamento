@@ -29,7 +29,7 @@ function buscarOuCriarCliente(telefone, nome) {
   }
 
   const agora = new Date()
-  const novaLinha = [telefone, nome, false, 0, mesAtual(), agora, agora, 0]
+  const novaLinha = [telefone, nome, false, 0, mesAtual(), agora, agora, 0, 0]
   aba.appendRow(novaLinha)
   return objetoDaLinha(CABECALHO_CLIENTES, novaLinha)
 }
@@ -57,6 +57,7 @@ function listarClientes(busca) {
         mensal: !!ajustado.mensal,
         cortesPagosMes: Number(ajustado.cortesPagosMes) || 0,
         cortesUsadosMes: Number(ajustado.cortesUsadosMes) || 0,
+        valorMensal: Number(ajustado.valorMensal) || 0,
       }
     })
 }
@@ -66,6 +67,7 @@ function atualizarStatusCliente(body) {
   const mensal = body && body.mensal
   const cortesPagosMes = body && body.cortesPagosMes
   const cortesUsadosMes = body && body.cortesUsadosMes
+  const valorMensal = body && body.valorMensal
 
   if (!telefone) throw new Error('Telefone obrigatório.')
 
@@ -74,6 +76,7 @@ function atualizarStatusCliente(body) {
   // gravar usados > pagos.
   const pagos = Math.max(0, Number(cortesPagosMes) || 0)
   const usados = Math.min(pagos, Math.max(0, Number(cortesUsadosMes) || 0))
+  const valor = Math.max(0, Number(valorMensal) || 0)
 
   const aba = getAba(ABA_CLIENTES, CABECALHO_CLIENTES)
   const valores = aba.getDataRange().getValues()
@@ -81,6 +84,7 @@ function atualizarStatusCliente(body) {
   const idxMensal = CABECALHO_CLIENTES.indexOf('mensal')
   const idxPagos = CABECALHO_CLIENTES.indexOf('cortesPagosMes')
   const idxUsados = CABECALHO_CLIENTES.indexOf('cortesUsadosMes')
+  const idxValor = CABECALHO_CLIENTES.indexOf('valorMensal')
   const idxMesRef = CABECALHO_CLIENTES.indexOf('mesReferencia')
   const idxAtualizado = CABECALHO_CLIENTES.indexOf('atualizadoEm')
 
@@ -90,6 +94,7 @@ function atualizarStatusCliente(body) {
       aba.getRange(linha, idxMensal + 1).setValue(!!mensal)
       aba.getRange(linha, idxPagos + 1).setValue(pagos)
       aba.getRange(linha, idxUsados + 1).setValue(usados)
+      aba.getRange(linha, idxValor + 1).setValue(valor)
       aba.getRange(linha, idxMesRef + 1).setValue(mesAtual())
       aba.getRange(linha, idxAtualizado + 1).setValue(new Date())
       return

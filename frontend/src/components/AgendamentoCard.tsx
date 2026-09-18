@@ -3,6 +3,7 @@ import type { Agendamento } from '../services/api'
 import { buildReminderLink } from '../lib/whatsapp'
 import { formatPhoneDisplay } from '../lib/phone'
 import { PacoteCortes } from './PacoteCortes'
+import { CampoValorMensal } from './CampoValorMensal'
 
 export function AgendamentoCard({
   agendamento,
@@ -11,12 +12,13 @@ export function AgendamentoCard({
 }: {
   agendamento: Agendamento
   onCancelar: (id: string) => void
-  onAtualizarStatus: (telefone: string, mensal: boolean, cortesPagosMes: number, cortesUsadosMes: number) => void
+  onAtualizarStatus: (telefone: string, mensal: boolean, cortesPagosMes: number, cortesUsadosMes: number, valorMensal: number) => void
 }) {
   const [editando, setEditando] = useState(false)
   const [mensal, setMensal] = useState(agendamento.clienteMensal)
   const [pagos, setPagos] = useState(agendamento.cortesPagosMes)
   const [usados, setUsados] = useState(agendamento.cortesUsadosMes)
+  const [valorMensal, setValorMensal] = useState(agendamento.valorMensal)
 
   const linkLembrete = buildReminderLink({
     telefone: agendamento.telefoneCliente,
@@ -67,11 +69,16 @@ export function AgendamentoCard({
             </span>
             <span className="toggle-label">Cliente mensal</span>
           </label>
-          {mensal && <PacoteCortes pagos={pagos} usados={usados} onChangePagos={setPagos} onChangeUsados={setUsados} />}
+          {mensal && (
+            <>
+              <CampoValorMensal valor={valorMensal} onChange={setValorMensal} />
+              <PacoteCortes pagos={pagos} usados={usados} onChangePagos={setPagos} onChangeUsados={setUsados} />
+            </>
+          )}
           <button
             className="btn-salvar-cliente"
             onClick={() => {
-              onAtualizarStatus(agendamento.telefoneCliente, mensal, pagos, usados)
+              onAtualizarStatus(agendamento.telefoneCliente, mensal, pagos, usados, valorMensal)
               setEditando(false)
             }}
           >

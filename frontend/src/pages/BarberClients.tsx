@@ -5,6 +5,7 @@ import { formatPhoneDisplay } from '../lib/phone'
 import { Marca } from '../components/Marca'
 import { PainelNav } from '../components/PainelNav'
 import { PacoteCortes } from '../components/PacoteCortes'
+import { CampoValorMensal } from '../components/CampoValorMensal'
 
 export default function BarberClients() {
   const [busca, setBusca] = useState('')
@@ -32,6 +33,7 @@ export default function BarberClients() {
         mensal: c.mensal,
         cortesPagosMes: c.cortesPagosMes,
         cortesUsadosMes: c.cortesUsadosMes,
+        valorMensal: c.valorMensal,
         pin,
       })
       carregar()
@@ -79,12 +81,18 @@ export default function BarberClients() {
           </label>
 
           {c.mensal && (
-            <PacoteCortes
-              pagos={c.cortesPagosMes}
-              usados={c.cortesUsadosMes}
-              onChangePagos={(v) => setClientes((prev) => prev.map((x) => (x.telefone === c.telefone ? { ...x, cortesPagosMes: v } : x)))}
-              onChangeUsados={(v) => setClientes((prev) => prev.map((x) => (x.telefone === c.telefone ? { ...x, cortesUsadosMes: v } : x)))}
-            />
+            <>
+              <CampoValorMensal
+                valor={c.valorMensal}
+                onChange={(v) => setClientes((prev) => prev.map((x) => (x.telefone === c.telefone ? { ...x, valorMensal: v } : x)))}
+              />
+              <PacoteCortes
+                pagos={c.cortesPagosMes}
+                usados={c.cortesUsadosMes}
+                onChangePagos={(v) => setClientes((prev) => prev.map((x) => (x.telefone === c.telefone ? { ...x, cortesPagosMes: v } : x)))}
+                onChangeUsados={(v) => setClientes((prev) => prev.map((x) => (x.telefone === c.telefone ? { ...x, cortesUsadosMes: v } : x)))}
+              />
+            </>
           )}
 
           <button className="btn-salvar-cliente" onClick={() => salvar(c)}>

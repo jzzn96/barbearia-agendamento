@@ -6,7 +6,7 @@ const ABA_CLIENTES = 'Clientes'
 // ser adicionadas no fim da planilha física (ver getAba() abaixo), então o
 // cabeçalho lógico precisa espelhar essa ordem — senão a leitura por índice
 // desalinha com os dados já gravados nas linhas antigas.
-const CABECALHO_CLIENTES = ['telefone', 'nome', 'mensal', 'cortesPagosMes', 'mesReferencia', 'criadoEm', 'atualizadoEm', 'cortesUsadosMes']
+const CABECALHO_CLIENTES = ['telefone', 'nome', 'mensal', 'cortesPagosMes', 'mesReferencia', 'criadoEm', 'atualizadoEm', 'cortesUsadosMes', 'valorMensal']
 
 const ABA_AGENDAMENTOS = 'Agendamentos'
 const CABECALHO_AGENDAMENTOS = ['id', 'eventoCalendarId', 'telefoneCliente', 'nomeCliente', 'data', 'horario', 'servico', 'duracaoMin', 'status', 'barbeiroId', 'criadoEm']
