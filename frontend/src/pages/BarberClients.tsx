@@ -45,7 +45,7 @@ export default function BarberClients() {
       <Marca />
       <PainelNav titulo="Clientes" />
 
-      <input placeholder="Buscar por nome ou telefone" value={busca} onChange={(e) => setBusca(e.target.value)} />
+      <input className="input-busca" placeholder="Buscar por nome ou telefone" value={busca} onChange={(e) => setBusca(e.target.value)} />
 
       {carregando && <p>Carregando...</p>}
       {erro && <p className="erro">{erro}</p>}

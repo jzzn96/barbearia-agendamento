@@ -28,6 +28,18 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Moldura dourada fixa em volta de toda a aplicação — fica parada na tela
+   mesmo com o conteúdo rolando por baixo dela. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 6px;
+  border: 1.5px solid var(--accent);
+  border-radius: 14px;
+  pointer-events: none;
+  z-index: 999;
+}
+
 .tela {
   max-width: 520px;
   margin: 0 auto;
@@ -47,6 +59,8 @@ h2 {
   color: var(--muted);
   margin-top: 24px;
   margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
 }
 
 /* Cabeçalho / hero da barbearia */
@@ -174,6 +188,10 @@ input:focus {
   border-color: var(--accent);
 }
 
+.input-busca {
+  margin-bottom: 18px;
+}
+
 button {
   background: var(--accent);
   color: var(--accent-contrast);
@@ -227,6 +245,9 @@ button:disabled {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding-bottom: 16px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--border);
 }
 
 /* Menu hamburguer do painel (troca entre Agenda/Clientes/Bloqueios) */
@@ -300,7 +321,7 @@ button:disabled {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin: 18px 0;
+  margin: 0 0 18px;
   text-transform: capitalize;
   background: var(--surface);
   border: 1px solid var(--border);
