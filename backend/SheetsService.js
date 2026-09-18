@@ -5,7 +5,7 @@ const ABA_CLIENTES = 'Clientes'
 const CABECALHO_CLIENTES = ['telefone', 'nome', 'mensal', 'cortesPagosMes', 'mesReferencia', 'criadoEm', 'atualizadoEm']
 
 const ABA_AGENDAMENTOS = 'Agendamentos'
-const CABECALHO_AGENDAMENTOS = ['id', 'eventoCalendarId', 'telefoneCliente', 'nomeCliente', 'data', 'horario', 'status', 'barbeiroId', 'criadoEm']
+const CABECALHO_AGENDAMENTOS = ['id', 'eventoCalendarId', 'telefoneCliente', 'nomeCliente', 'data', 'horario', 'servico', 'duracaoMin', 'status', 'barbeiroId', 'criadoEm']
 
 // Cria a aba com cabeçalho na primeira vez que for usada — não precisa
 // preparar a planilha manualmente antes de rodar, só criar uma em branco.

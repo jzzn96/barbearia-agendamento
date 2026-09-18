@@ -28,7 +28,7 @@ function rotear(e, method) {
 function executarAcao(action, method, params, body) {
   switch (action) {
     case 'horariosDisponiveis':
-      return horariosDisponiveis(params.data)
+      return horariosDisponiveis(params.data, params.servico)
 
     case 'criarAgendamento':
       return criarAgendamento(body)

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { api, ApiError } from '../services/api'
 import { formatPhoneInput, isValidPhone } from '../lib/phone'
+import { SERVICOS, type ServicoId } from '../lib/servicos'
 
 function proximosDias(qtd: number): { valor: string; label: string }[] {
   const dias = []
@@ -18,6 +19,7 @@ type Etapa = 'escolher-horario' | 'form' | 'enviando' | 'sucesso' | 'erro'
 
 export default function Booking() {
   const dias = useMemo(() => proximosDias(14), [])
+  const [servicoEscolhido, setServicoEscolhido] = useState<ServicoId>(SERVICOS[0].id)
   const [dataEscolhida, setDataEscolhida] = useState(dias[0].valor)
   const [horarios, setHorarios] = useState<string[]>([])
   const [carregandoHorarios, setCarregandoHorarios] = useState(false)
@@ -32,11 +34,11 @@ export default function Booking() {
     setHorarioEscolhido(null)
     setErro('')
     api
-      .horariosDisponiveis(dataEscolhida)
+      .horariosDisponiveis(dataEscolhida, servicoEscolhido)
       .then(setHorarios)
       .catch((e) => setErro(e instanceof ApiError ? e.message : 'Não foi possível carregar os horários.'))
       .finally(() => setCarregandoHorarios(false))
-  }, [dataEscolhida])
+  }, [dataEscolhida, servicoEscolhido])
 
   async function confirmar() {
     if (!horarioEscolhido) return
@@ -54,6 +56,7 @@ export default function Booking() {
         telefone,
         data: dataEscolhida,
         horario: horarioEscolhido,
+        servico: servicoEscolhido,
         honeypot: '',
       })
       setEtapa('sucesso')
@@ -61,9 +64,11 @@ export default function Booking() {
       setErro(e instanceof ApiError ? e.message : 'Esse horário acabou de ser preenchido, escolha outro.')
       setEtapa('erro')
       // Reconsulta os horários porque provavelmente foi conflito de agenda
-      api.horariosDisponiveis(dataEscolhida).then(setHorarios).catch(() => {})
+      api.horariosDisponiveis(dataEscolhida, servicoEscolhido).then(setHorarios).catch(() => {})
     }
   }
+
+  const servico = SERVICOS.find((s) => s.id === servicoEscolhido)!
 
   if (etapa === 'sucesso') {
     return (
@@ -76,7 +81,7 @@ export default function Booking() {
           <div className="sucesso-icone">✓</div>
           <h1>Agendado!</h1>
           <p className="card-sub">
-            Te esperamos dia {new Date(`${dataEscolhida}T00:00:00`).toLocaleDateString('pt-BR')} às {horarioEscolhido}.
+            {servico.nome} — {new Date(`${dataEscolhida}T00:00:00`).toLocaleDateString('pt-BR')} às {horarioEscolhido}.
           </p>
         </div>
       </div>
@@ -94,8 +99,21 @@ export default function Booking() {
         <div className="hero-avatar">💈</div>
         <div>
           <p className="hero-titulo">Agende seu horário</p>
-          <p className="hero-sub">Escolha o dia e o horário que preferir</p>
+          <p className="hero-sub">Escolha o serviço, o dia e o horário que preferir</p>
         </div>
+      </div>
+
+      <h2>Escolha o serviço</h2>
+      <div className="chips">
+        {SERVICOS.map((s) => (
+          <button
+            key={s.id}
+            className={s.id === servicoEscolhido ? 'chip chip-ativo' : 'chip'}
+            onClick={() => setServicoEscolhido(s.id)}
+          >
+            {s.nome} · {s.duracaoMin} min
+          </button>
+        ))}
       </div>
 
       <h2>Escolha o dia</h2>
@@ -133,6 +151,9 @@ export default function Booking() {
       {(etapa === 'form' || etapa === 'enviando' || etapa === 'erro') && horarioEscolhido && (
         <div className="form">
           <h2 style={{ marginTop: 0 }}>Seus dados</h2>
+          <p className="card-sub" style={{ marginTop: -6 }}>
+            {servico.nome} · {new Date(`${dataEscolhida}T00:00:00`).toLocaleDateString('pt-BR')} às {horarioEscolhido}
+          </p>
           <label htmlFor="campo-nome">Nome</label>
           <input id="campo-nome" placeholder="Seu nome" value={nome} onChange={(e) => setNome(e.target.value)} />
           <label htmlFor="campo-telefone">Telefone</label>

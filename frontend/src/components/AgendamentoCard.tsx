@@ -30,7 +30,9 @@ export function AgendamentoCard({
           Lembrar 💬
         </a>
       </div>
-      <div className="card-sub">{agendamento.telefoneCliente}</div>
+      <div className="card-sub">
+        {agendamento.telefoneCliente} · {agendamento.servico} ({agendamento.duracaoMin} min)
+      </div>
 
       {!editando && (
         <div className="card-status">

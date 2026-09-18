@@ -2,8 +2,11 @@
 // verdade pro HORÁRIO em si — inclusive eventos criados manualmente pelo
 // barbeiro fora do sistema contam como ocupados aqui.
 
-function horariosDisponiveis(data) {
+// "servicoId" decide a duração (ver SERVICOS em Config.js), que por sua vez
+// decide quantos slots de 30min consecutivos precisam estar livres.
+function horariosDisponiveis(data, servicoId) {
   if (!data) throw new Error('Parâmetro "data" obrigatório (AAAA-MM-DD).')
+  const duracaoMin = resolverServico(servicoId).duracaoMin
 
   const config = getConfig()
   const calendar = CalendarApp.getCalendarById(config.calendarId)
@@ -12,9 +15,30 @@ function horariosDisponiveis(data) {
   const inicioDia = new Date(`${data}T00:00:00`)
   const fimDia = new Date(`${data}T23:59:59`)
   const eventos = calendar.getEvents(inicioDia, fimDia)
-  const ocupados = new Set(eventos.map((ev) => formatarHora(ev.getStartTime())))
 
-  return gerarSlots().filter((h) => !ocupados.has(h))
+  // Marca TODO slot de 30min coberto por cada evento como ocupado — um
+  // evento de 60min (ou um bloqueio manual do barbeiro) não pode deixar
+  // o segundo slot aparecendo como livre.
+  const ocupados = new Set()
+  eventos.forEach((ev) => {
+    let cursor = new Date(ev.getStartTime())
+    const fimEvento = ev.getEndTime()
+    while (cursor < fimEvento) {
+      ocupados.add(formatarHora(cursor))
+      cursor = new Date(cursor.getTime() + DURACAO_SLOT_MIN * 60000)
+    }
+  })
+
+  const slots = gerarSlots()
+  const passosNecessarios = Math.ceil(duracaoMin / DURACAO_SLOT_MIN)
+
+  return slots.filter((_, i) => {
+    for (let p = 0; p < passosNecessarios; p++) {
+      const slot = slots[i + p]
+      if (slot === undefined || ocupados.has(slot)) return false
+    }
+    return true
+  })
 }
 
 function gerarSlots() {
@@ -29,13 +53,13 @@ function formatarHora(date) {
   return Utilities.formatDate(date, 'America/Sao_Paulo', 'HH:mm')
 }
 
-function criarEventoCalendar(data, horario, nome, telefone) {
+function criarEventoCalendar(data, horario, nome, telefone, tituloServico, duracaoMin) {
   const config = getConfig()
   const calendar = CalendarApp.getCalendarById(config.calendarId)
   const inicio = new Date(`${data}T${horario}:00`)
-  const fim = new Date(inicio.getTime() + DURACAO_SLOT_MIN * 60000)
+  const fim = new Date(inicio.getTime() + duracaoMin * 60000)
 
-  const evento = calendar.createEvent(`${nome} - corte`, inicio, fim, {
+  const evento = calendar.createEvent(`${nome} - ${tituloServico}`, inicio, fim, {
     description: `Agendado pelo sistema. Telefone: ${telefone}`,
   })
 

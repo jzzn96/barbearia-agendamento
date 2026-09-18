@@ -26,6 +26,22 @@ const DURACAO_SLOT_MIN = 30
 
 const BARBEIRO_ID = 'barbeiro-1'
 
+// Catálogo de serviços — a duração é o que decide quantos slots de 30min
+// o agendamento ocupa na Agenda (ver horariosDisponiveis() e
+// criarEventoCalendar() em CalendarService.js). O cliente manda só o id
+// ("servico"); a duração nunca vem do cliente, pra não dar pra forjar.
+const SERVICOS = {
+  corte: { nome: 'Corte de Cabelo', duracaoMin: 30 },
+  barba: { nome: 'Barba', duracaoMin: 30 },
+  combo: { nome: 'Cabelo e Barba', duracaoMin: 60 },
+}
+
+function resolverServico(servicoId) {
+  const servico = SERVICOS[servicoId]
+  if (!servico) throw new Error('Serviço inválido: ' + servicoId)
+  return servico
+}
+
 function mesAtual() {
   return Utilities.formatDate(new Date(), 'America/Sao_Paulo', 'yyyy-MM')
 }

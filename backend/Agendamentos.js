@@ -8,18 +8,20 @@ function criarAgendamento(body) {
   const telefoneBruto = body && body.telefone
   const data = body && body.data
   const horario = body && body.horario
+  const servicoId = body && body.servico
   const honeypot = body && body.honeypot
 
   if (honeypot) {
     // Campo invisível preenchido = quase certeza de bot. Finge sucesso
     // sem criar nada, pra não dar pista de que foi bloqueado.
-    return { id: 'ignorado', telefoneCliente: telefoneBruto, nomeCliente: nome, data, horario, status: 'agendado', clienteMensal: false, cortesPagosMes: 0 }
+    return { id: 'ignorado', telefoneCliente: telefoneBruto, nomeCliente: nome, data, horario, servico: servicoId, status: 'agendado', clienteMensal: false, cortesPagosMes: 0 }
   }
 
-  if (!nome || !telefoneBruto || !data || !horario) {
-    throw new Error('Preencha nome, telefone, data e horário.')
+  if (!nome || !telefoneBruto || !data || !horario || !servicoId) {
+    throw new Error('Preencha nome, telefone, serviço, data e horário.')
   }
 
+  const servico = resolverServico(servicoId)
   const telefone = normalizarTelefone(telefoneBruto)
 
   const lock = LockService.getScriptLock()
@@ -30,17 +32,17 @@ function criarAgendamento(body) {
   try {
     rejeitarSpam(telefone)
 
-    const livres = horariosDisponiveis(data)
+    const livres = horariosDisponiveis(data, servicoId)
     if (livres.indexOf(horario) === -1) {
       throw new Error('Esse horário acabou de ser preenchido, escolha outro.')
     }
 
-    const eventoId = criarEventoCalendar(data, horario, nome, telefone)
+    const eventoId = criarEventoCalendar(data, horario, nome, telefone, servico.nome, servico.duracaoMin)
     const cliente = buscarOuCriarCliente(telefone, nome)
 
     const id = Utilities.getUuid()
     const aba = getAba(ABA_AGENDAMENTOS, CABECALHO_AGENDAMENTOS)
-    aba.appendRow([id, eventoId, telefone, nome, data, horario, 'agendado', BARBEIRO_ID, new Date()])
+    aba.appendRow([id, eventoId, telefone, nome, data, horario, servico.nome, servico.duracaoMin, 'agendado', BARBEIRO_ID, new Date()])
 
     return {
       id,
@@ -48,6 +50,8 @@ function criarAgendamento(body) {
       nomeCliente: nome,
       data,
       horario,
+      servico: servico.nome,
+      duracaoMin: servico.duracaoMin,
       status: 'agendado',
       clienteMensal: !!cliente.mensal,
       cortesPagosMes: Number(cliente.cortesPagosMes) || 0,
@@ -85,6 +89,8 @@ function listarAgendamentosPorData(data) {
         nomeCliente: l.nomeCliente,
         data: l.data,
         horario: l.horario,
+        servico: l.servico,
+        duracaoMin: Number(l.duracaoMin) || 30,
         status: l.status,
         clienteMensal: !!cliente.mensal,
         cortesPagosMes: Number(cliente.cortesPagosMes) || 0,

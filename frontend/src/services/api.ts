@@ -6,6 +6,8 @@ export type Agendamento = {
   nomeCliente: string
   data: string // AAAA-MM-DD
   horario: string // HH:mm
+  servico: string
+  duracaoMin: number
   status: 'agendado' | 'concluido' | 'cancelado'
   clienteMensal: boolean
   cortesPagosMes: number
@@ -16,6 +18,7 @@ export type NovoAgendamento = {
   telefone: string
   data: string
   horario: string
+  servico: string // id do serviço (ver lib/servicos.ts)
   honeypot: string // deixar sempre vazio; se vier preenchido é bot
 }
 
@@ -62,7 +65,8 @@ async function call<T>(action: string, options?: { method?: 'GET' | 'POST'; para
 }
 
 export const api = {
-  horariosDisponiveis: (data: string) => call<string[]>('horariosDisponiveis', { params: { data } }),
+  horariosDisponiveis: (data: string, servico: string) =>
+    call<string[]>('horariosDisponiveis', { params: { data, servico } }),
 
   criarAgendamento: (novo: NovoAgendamento) => call<Agendamento>('criarAgendamento', { method: 'POST', body: novo }),
 
