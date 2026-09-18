@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Redirecionando...</title>
+    <script>
+      // GitHub Pages não sabe servir rotas de client-side router — sem isso,
+      // recarregar a página em /painel (ou compartilhar esse link direto)
+      // dá 404. Truque padrão: rafgraph/spa-github-pages.
+      var segmentsToKeep = 1 // preserva o prefixo /barbearia-agendamento/
+      var l = window.location
+      var path = l.pathname.split('/').slice(0, 1 + segmentsToKeep).join('/')
+      l.replace(
+        l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+          path +
+          '/?p=/' +
+          l.pathname.slice(path.length + 1).replace(/&/g, '~and~') +
+          (l.search ? '&q=' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+          l.hash,
+      )
+    </script>
+  </head>
+  <body></body>
+</html>

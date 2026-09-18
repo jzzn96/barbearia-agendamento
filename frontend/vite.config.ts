@@ -2,10 +2,11 @@ import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
-// Ajuste "base" pro nome do repositório quando publicar no GitHub Pages
-// (ex: '/barbearia/' se o repo se chamar "barbearia"). '/' funciona em dev.
+// GitHub Pages de projeto serve em usuario.github.io/<repo>/, então o build
+// de produção precisa desse prefixo no "base" — só o workflow de deploy seta
+// GITHUB_PAGES=true (ver .github/workflows/deploy.yml). Em dev fica '/'.
 export default defineConfig({
-  base: '/',
+  base: process.env.GITHUB_PAGES ? '/barbearia-agendamento/' : '/',
   plugins: [
     react(),
     VitePWA({
@@ -18,7 +19,7 @@ export default defineConfig({
         theme_color: '#111111',
         background_color: '#111111',
         display: 'standalone',
-        start_url: '/',
+        start_url: '.',
         // TODO: trocar por PNG 192/512 reais (esse SVG é só placeholder)
         icons: [
           { src: 'icons/icon.svg', sizes: '512x512', type: 'image/svg+xml', purpose: 'any' },

@@ -7,7 +7,7 @@ import { RequireBarberAuth } from './components/RequireBarberAuth'
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <Routes>
         <Route path="/" element={<Booking />} />
         <Route path="/painel/entrar" element={<BarberLogin />} />
