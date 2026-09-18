@@ -13,16 +13,28 @@ export function PacoteCortes({
 }) {
   const restam = Math.max(0, pagos - usados)
 
+  // Usados nunca pode passar de pagos — nem digitando +1 nele, nem
+  // baixando pagos pra menos do que já tinha sido usado.
+  function alterarPagos(novoPagos: number) {
+    const pagosClamped = Math.max(0, novoPagos)
+    onChangePagos(pagosClamped)
+    if (usados > pagosClamped) onChangeUsados(pagosClamped)
+  }
+
+  function alterarUsados(novoUsados: number) {
+    onChangeUsados(Math.min(pagos, Math.max(0, novoUsados)))
+  }
+
   return (
     <div className="pacote-cortes">
       <div className="pacote-linha">
         <span>Cortes pagos</span>
         <div className="stepper">
-          <button type="button" onClick={() => onChangePagos(Math.max(0, pagos - 1))}>
+          <button type="button" onClick={() => alterarPagos(pagos - 1)}>
             −
           </button>
           <strong>{pagos}</strong>
-          <button type="button" onClick={() => onChangePagos(pagos + 1)}>
+          <button type="button" onClick={() => alterarPagos(pagos + 1)}>
             +
           </button>
         </div>
@@ -31,11 +43,11 @@ export function PacoteCortes({
       <div className="pacote-linha">
         <span>Cortes usados</span>
         <div className="stepper">
-          <button type="button" onClick={() => onChangeUsados(Math.max(0, usados - 1))}>
+          <button type="button" onClick={() => alterarUsados(usados - 1)}>
             −
           </button>
           <strong>{usados}</strong>
-          <button type="button" onClick={() => onChangeUsados(usados + 1)}>
+          <button type="button" disabled={usados >= pagos} onClick={() => alterarUsados(usados + 1)}>
             +
           </button>
         </div>

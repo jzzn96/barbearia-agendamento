@@ -69,6 +69,12 @@ function atualizarStatusCliente(body) {
 
   if (!telefone) throw new Error('Telefone obrigatório.')
 
+  // Rede de segurança do lado do servidor — o front já trava isso na UI,
+  // mas quem chama a API direto (ou uma versão antiga em cache) não pode
+  // gravar usados > pagos.
+  const pagos = Math.max(0, Number(cortesPagosMes) || 0)
+  const usados = Math.min(pagos, Math.max(0, Number(cortesUsadosMes) || 0))
+
   const aba = getAba(ABA_CLIENTES, CABECALHO_CLIENTES)
   const valores = aba.getDataRange().getValues()
 
@@ -82,8 +88,8 @@ function atualizarStatusCliente(body) {
     if (String(valores[i][0]) === telefone) {
       const linha = i + 1
       aba.getRange(linha, idxMensal + 1).setValue(!!mensal)
-      aba.getRange(linha, idxPagos + 1).setValue(Number(cortesPagosMes) || 0)
-      aba.getRange(linha, idxUsados + 1).setValue(Number(cortesUsadosMes) || 0)
+      aba.getRange(linha, idxPagos + 1).setValue(pagos)
+      aba.getRange(linha, idxUsados + 1).setValue(usados)
       aba.getRange(linha, idxMesRef + 1).setValue(mesAtual())
       aba.getRange(linha, idxAtualizado + 1).setValue(new Date())
       return
