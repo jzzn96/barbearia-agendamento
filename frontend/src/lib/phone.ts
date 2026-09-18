@@ -24,3 +24,11 @@ export function isValidPhone(raw: string): boolean {
   const digits = raw.replace(/\D/g, '')
   return digits.length === 10 || digits.length === 11
 }
+
+// Pro telefone já salvo (formato 55DDNNNNNNNNN) — remove o DDI antes de
+// aplicar a mesma máscara visual usada no formulário de agendamento.
+export function formatPhoneDisplay(stored: string): string {
+  const digits = stored.replace(/\D/g, '')
+  const semDDI = digits.startsWith('55') ? digits.slice(2) : digits
+  return formatPhoneInput(semDDI)
+}

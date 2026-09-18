@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api, ApiError, type Cliente } from '../services/api'
 import { barberSession } from '../services/barberSession'
+import { formatPhoneDisplay } from '../lib/phone'
 import { Marca } from '../components/Marca'
 import { PacoteCortes } from '../components/PacoteCortes'
 
@@ -56,30 +57,45 @@ export default function BarberClients() {
       {erro && <p className="erro">{erro}</p>}
 
       {clientes.map((c) => (
-        <div className="card" key={c.telefone}>
-          <strong>{c.nome}</strong>
-          <div className="card-sub">{c.telefone}</div>
-          <div className="card-status">
-            <label>
-              <input
-                type="checkbox"
-                checked={c.mensal}
-                onChange={(e) => setClientes((prev) => prev.map((x) => (x.telefone === c.telefone ? { ...x, mensal: e.target.checked } : x)))}
-              />
-              Mensal
-            </label>
-            {c.mensal && (
-              <PacoteCortes
-                pagos={c.cortesPagosMes}
-                usados={c.cortesUsadosMes}
-                onChangePagos={(v) => setClientes((prev) => prev.map((x) => (x.telefone === c.telefone ? { ...x, cortesPagosMes: v } : x)))}
-                onChangeUsados={(v) => setClientes((prev) => prev.map((x) => (x.telefone === c.telefone ? { ...x, cortesUsadosMes: v } : x)))}
-              />
-            )}
-            <button className="link" onClick={() => salvar(c)}>
-              salvar
-            </button>
+        <div className="card cliente-card" key={c.telefone}>
+          <div className="cliente-topo">
+            <div className="cliente-avatar">{c.nome.charAt(0).toUpperCase()}</div>
+            <div className="cliente-dados">
+              <div className="cliente-linha">
+                <span className="cliente-label">Nome</span>
+                <strong>{c.nome}</strong>
+              </div>
+              <div className="cliente-linha">
+                <span className="cliente-label">Tel</span>
+                <span>{formatPhoneDisplay(c.telefone)}</span>
+              </div>
+            </div>
           </div>
+
+          <label className="toggle-mensal">
+            <input
+              type="checkbox"
+              checked={c.mensal}
+              onChange={(e) => setClientes((prev) => prev.map((x) => (x.telefone === c.telefone ? { ...x, mensal: e.target.checked } : x)))}
+            />
+            <span className="toggle-track">
+              <span className="toggle-thumb" />
+            </span>
+            <span className="toggle-label">Cliente mensal</span>
+          </label>
+
+          {c.mensal && (
+            <PacoteCortes
+              pagos={c.cortesPagosMes}
+              usados={c.cortesUsadosMes}
+              onChangePagos={(v) => setClientes((prev) => prev.map((x) => (x.telefone === c.telefone ? { ...x, cortesPagosMes: v } : x)))}
+              onChangeUsados={(v) => setClientes((prev) => prev.map((x) => (x.telefone === c.telefone ? { ...x, cortesUsadosMes: v } : x)))}
+            />
+          )}
+
+          <button className="btn-salvar-cliente" onClick={() => salvar(c)}>
+            Salvar
+          </button>
         </div>
       ))}
     </div>
