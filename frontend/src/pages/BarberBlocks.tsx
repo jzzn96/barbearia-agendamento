@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
 import { api, ApiError, type Bloqueio } from '../services/api'
 import { barberSession } from '../services/barberSession'
 import { Marca } from '../components/Marca'
+import { PainelNav } from '../components/PainelNav'
 
 function hoje(): string {
   return new Date().toISOString().slice(0, 10)
@@ -67,13 +67,7 @@ export default function BarberBlocks() {
   return (
     <div className="tela">
       <Marca />
-      <div className="topo-painel">
-        <h1>Bloqueios</h1>
-        <div className="topo-painel-links">
-          <Link to="/painel/clientes">Clientes</Link>
-          <Link to="/painel">Agenda</Link>
-        </div>
-      </div>
+      <PainelNav titulo="Bloqueios" />
 
       <div className="nav-data">
         <button onClick={() => setData(somaDias(data, -1))}>◂</button>

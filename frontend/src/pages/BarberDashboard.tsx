@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
 import { api, ApiError, type Agendamento } from '../services/api'
 import { barberSession } from '../services/barberSession'
 import { AgendamentoCard } from '../components/AgendamentoCard'
 import { Marca } from '../components/Marca'
+import { PainelNav } from '../components/PainelNav'
 
 function hoje(): string {
   return new Date().toISOString().slice(0, 10)
@@ -57,13 +57,7 @@ export default function BarberDashboard() {
   return (
     <div className="tela">
       <Marca />
-      <div className="topo-painel">
-        <h1>Agenda</h1>
-        <div className="topo-painel-links">
-          <Link to="/painel/bloqueios">Bloqueios</Link>
-          <Link to="/painel/clientes">Clientes</Link>
-        </div>
-      </div>
+      <PainelNav titulo="Agenda" />
 
       <div className="nav-data">
         <button onClick={() => setData(somaDias(data, -1))}>◂</button>

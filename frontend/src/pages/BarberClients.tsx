@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
 import { api, ApiError, type Cliente } from '../services/api'
 import { barberSession } from '../services/barberSession'
 import { formatPhoneDisplay } from '../lib/phone'
 import { Marca } from '../components/Marca'
+import { PainelNav } from '../components/PainelNav'
 import { PacoteCortes } from '../components/PacoteCortes'
 
 export default function BarberClients() {
@@ -43,13 +43,7 @@ export default function BarberClients() {
   return (
     <div className="tela">
       <Marca />
-      <div className="topo-painel">
-        <h1>Clientes</h1>
-        <div className="topo-painel-links">
-          <Link to="/painel/bloqueios">Bloqueios</Link>
-          <Link to="/painel">Agenda</Link>
-        </div>
-      </div>
+      <PainelNav titulo="Clientes" />
 
       <input placeholder="Buscar por nome ou telefone" value={busca} onChange={(e) => setBusca(e.target.value)} />
 
