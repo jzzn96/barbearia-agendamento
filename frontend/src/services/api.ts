@@ -29,6 +29,23 @@ export type Cliente = {
   cortesPagosMes: number
 }
 
+export type Bloqueio = {
+  id: string
+  titulo: string
+  diaTodo: boolean
+  horarioInicio: string | null
+  horarioFim: string | null
+}
+
+export type NovoBloqueio = {
+  data: string
+  diaTodo: boolean
+  horarioInicio?: string
+  horarioFim?: string
+  motivo?: string
+  pin: string
+}
+
 class ApiError extends Error {}
 
 // O Apps Script tem uma peculiaridade de CORS com POST em JSON (dispara
@@ -81,6 +98,14 @@ export const api = {
 
   cancelarAgendamento: (params: { id: string; pin: string }) =>
     call<void>('cancelarAgendamento', { method: 'POST', body: params }),
+
+  listarBloqueios: (data: string, pin: string) =>
+    call<Bloqueio[]>('listarBloqueios', { params: { data, pin } }),
+
+  criarBloqueio: (novo: NovoBloqueio) => call<{ id: string; titulo: string }>('criarBloqueio', { method: 'POST', body: novo }),
+
+  removerBloqueio: (params: { id: string; pin: string }) =>
+    call<void>('removerBloqueio', { method: 'POST', body: params }),
 }
 
 export { ApiError }

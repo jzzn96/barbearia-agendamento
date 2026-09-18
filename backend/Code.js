@@ -49,6 +49,18 @@ function executarAcao(action, method, params, body) {
       exigirPin(body.pin)
       return cancelarAgendamento(body.id)
 
+    case 'criarBloqueio':
+      exigirPin(body.pin)
+      return criarBloqueio(body.data, body.horarioInicio, body.horarioFim, body.motivo, body.diaTodo)
+
+    case 'listarBloqueios':
+      exigirPin(params.pin)
+      return listarBloqueios(params.data)
+
+    case 'removerBloqueio':
+      exigirPin(body.pin)
+      return removerBloqueio(body.id)
+
     default:
       throw new Error('Ação desconhecida: ' + action)
   }

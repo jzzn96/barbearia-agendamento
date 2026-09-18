@@ -229,6 +229,11 @@ button:disabled {
   align-items: center;
 }
 
+.topo-painel-links {
+  display: flex;
+  gap: 14px;
+}
+
 .topo-painel a {
   color: var(--accent);
   font-size: 0.9rem;

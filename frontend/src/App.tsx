@@ -3,6 +3,7 @@ import Booking from './pages/Booking'
 import BarberLogin from './pages/BarberLogin'
 import BarberDashboard from './pages/BarberDashboard'
 import BarberClients from './pages/BarberClients'
+import BarberBlocks from './pages/BarberBlocks'
 import { RequireBarberAuth } from './components/RequireBarberAuth'
 
 export default function App() {
@@ -24,6 +25,14 @@ export default function App() {
           element={
             <RequireBarberAuth>
               <BarberClients />
+            </RequireBarberAuth>
+          }
+        />
+        <Route
+          path="/painel/bloqueios"
+          element={
+            <RequireBarberAuth>
+              <BarberBlocks />
             </RequireBarberAuth>
           }
         />

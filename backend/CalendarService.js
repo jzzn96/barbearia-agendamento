@@ -73,3 +73,52 @@ function excluirEventoCalendar(eventoId) {
   const evento = calendar.getEventById(eventoId)
   if (evento) evento.deleteEvent()
 }
+
+// Bloqueios são eventos comuns na mesma Agenda (por isso já contam como
+// ocupados em horariosDisponiveis, sem precisar de lógica extra) — só o
+// prefixo do título ("Bloqueado") que os diferencia de um agendamento real
+// na hora de listar/remover.
+const PREFIXO_BLOQUEIO = 'Bloqueado'
+
+function criarBloqueio(data, horarioInicio, horarioFim, motivo, diaTodo) {
+  if (!data) throw new Error('Parâmetro "data" obrigatório (AAAA-MM-DD).')
+  const config = getConfig()
+  const calendar = CalendarApp.getCalendarById(config.calendarId)
+  const titulo = motivo ? `${PREFIXO_BLOQUEIO} - ${motivo}` : PREFIXO_BLOQUEIO
+
+  let evento
+  if (diaTodo) {
+    evento = calendar.createAllDayEvent(titulo, new Date(`${data}T00:00:00`))
+  } else {
+    if (!horarioInicio || !horarioFim) throw new Error('Informe o horário de início e fim do bloqueio.')
+    const inicio = new Date(`${data}T${horarioInicio}:00`)
+    const fim = new Date(`${data}T${horarioFim}:00`)
+    if (fim <= inicio) throw new Error('O horário final precisa ser depois do inicial.')
+    evento = calendar.createEvent(titulo, inicio, fim)
+  }
+
+  return { id: evento.getId(), titulo }
+}
+
+function listarBloqueios(data) {
+  if (!data) throw new Error('Parâmetro "data" obrigatório (AAAA-MM-DD).')
+  const config = getConfig()
+  const calendar = CalendarApp.getCalendarById(config.calendarId)
+  const inicioDia = new Date(`${data}T00:00:00`)
+  const fimDia = new Date(`${data}T23:59:59`)
+
+  return calendar
+    .getEvents(inicioDia, fimDia)
+    .filter((e) => e.getTitle().indexOf(PREFIXO_BLOQUEIO) === 0)
+    .map((e) => ({
+      id: e.getId(),
+      titulo: e.getTitle(),
+      diaTodo: e.isAllDayEvent(),
+      horarioInicio: e.isAllDayEvent() ? null : formatarHora(e.getStartTime()),
+      horarioFim: e.isAllDayEvent() ? null : formatarHora(e.getEndTime()),
+    }))
+}
+
+function removerBloqueio(eventoId) {
+  excluirEventoCalendar(eventoId)
+}

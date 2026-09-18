@@ -37,7 +37,10 @@ export default function BarberClients() {
       <Marca />
       <div className="topo-painel">
         <h1>Clientes</h1>
-        <Link to="/painel">Agenda</Link>
+        <div className="topo-painel-links">
+          <Link to="/painel/bloqueios">Bloqueios</Link>
+          <Link to="/painel">Agenda</Link>
+        </div>
       </div>
 
       <input placeholder="Buscar por nome ou telefone" value={busca} onChange={(e) => setBusca(e.target.value)} />

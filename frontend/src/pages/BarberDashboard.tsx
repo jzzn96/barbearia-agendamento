@@ -59,7 +59,10 @@ export default function BarberDashboard() {
       <Marca />
       <div className="topo-painel">
         <h1>Agenda</h1>
-        <Link to="/painel/clientes">Clientes</Link>
+        <div className="topo-painel-links">
+          <Link to="/painel/bloqueios">Bloqueios</Link>
+          <Link to="/painel/clientes">Clientes</Link>
+        </div>
       </div>
 
       <div className="nav-data">
