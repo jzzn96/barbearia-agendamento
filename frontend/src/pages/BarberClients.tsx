@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api, ApiError, type Cliente } from '../services/api'
 import { barberSession } from '../services/barberSession'
+import { Marca } from '../components/Marca'
 
 export default function BarberClients() {
   const [busca, setBusca] = useState('')
@@ -33,10 +34,7 @@ export default function BarberClients() {
 
   return (
     <div className="tela">
-      <div className="marca">
-        <div className="marca-avatar">B</div>
-        <span className="marca-nome">Barbearia</span>
-      </div>
+      <Marca />
       <div className="topo-painel">
         <h1>Clientes</h1>
         <Link to="/painel">Agenda</Link>

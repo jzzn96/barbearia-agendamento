@@ -7,8 +7,9 @@
   --border: rgba(255, 255, 255, 0.08);
   --text: #f4f4f5;
   --muted: #9a9aa2;
-  --accent: #fc4b08;
-  --accent-contrast: #111;
+  --accent: #c9a961;
+  --accent-contrast: #1a1508;
+  --gold-light: #ecdcb0;
   --success: #22c55e;
   --danger: #ff6b6b;
   --radius-lg: 18px;
@@ -57,22 +58,23 @@ h2 {
 }
 
 .marca-avatar {
-  width: 28px;
-  height: 28px;
-  border-radius: var(--radius-full);
-  background: var(--accent);
-  color: var(--accent-contrast);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 0.8rem;
+  width: 34px;
+  height: 34px;
   flex-shrink: 0;
+}
+
+.marca-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
 }
 
 .marca-nome {
   font-weight: 700;
   font-size: 0.95rem;
+  color: var(--gold-light);
+  letter-spacing: 0.02em;
 }
 
 .hero {

@@ -13,11 +13,11 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['icons/icon.svg'],
       manifest: {
-        name: 'Barbearia - Agendamento',
-        short_name: 'Barbearia',
-        description: 'Agende seu horário na barbearia',
-        theme_color: '#111111',
-        background_color: '#111111',
+        name: 'Barbearia Gilmar Fongaro',
+        short_name: 'Gilmar Fongaro',
+        description: 'Agende seu horário na Barbearia Gilmar Fongaro',
+        theme_color: '#050505',
+        background_color: '#050505',
         display: 'standalone',
         start_url: '.',
         // TODO: trocar por PNG 192/512 reais (esse SVG é só placeholder)

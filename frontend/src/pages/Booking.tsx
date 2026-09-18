@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { api, ApiError } from '../services/api'
 import { formatPhoneInput, isValidPhone } from '../lib/phone'
 import { SERVICOS, type ServicoId } from '../lib/servicos'
+import { Marca } from '../components/Marca'
 
 function proximosDias(qtd: number): { valor: string; label: string }[] {
   const dias = []
@@ -73,10 +74,7 @@ export default function Booking() {
   if (etapa === 'sucesso') {
     return (
       <div className="tela">
-        <div className="marca">
-          <div className="marca-avatar">B</div>
-          <span className="marca-nome">Barbearia</span>
-        </div>
+        <Marca />
         <div className="sucesso">
           <div className="sucesso-icone">✓</div>
           <h1>Agendado!</h1>
@@ -90,10 +88,7 @@ export default function Booking() {
 
   return (
     <div className="tela">
-      <div className="marca">
-        <div className="marca-avatar">B</div>
-        <span className="marca-nome">Barbearia</span>
-      </div>
+      <Marca />
 
       <div className="hero">
         <div className="hero-avatar">💈</div>

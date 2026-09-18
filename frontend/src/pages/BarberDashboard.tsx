@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { api, ApiError, type Agendamento } from '../services/api'
 import { barberSession } from '../services/barberSession'
 import { AgendamentoCard } from '../components/AgendamentoCard'
+import { Marca } from '../components/Marca'
 
 function hoje(): string {
   return new Date().toISOString().slice(0, 10)
@@ -55,10 +56,7 @@ export default function BarberDashboard() {
 
   return (
     <div className="tela">
-      <div className="marca">
-        <div className="marca-avatar">B</div>
-        <span className="marca-nome">Barbearia</span>
-      </div>
+      <Marca />
       <div className="topo-painel">
         <h1>Agenda</h1>
         <Link to="/painel/clientes">Clientes</Link>

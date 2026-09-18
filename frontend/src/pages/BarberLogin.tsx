@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api, ApiError } from '../services/api'
 import { barberSession } from '../services/barberSession'
+import { Marca } from '../components/Marca'
 
 export default function BarberLogin() {
   const [pin, setPin] = useState('')
@@ -26,10 +27,7 @@ export default function BarberLogin() {
 
   return (
     <div className="tela">
-      <div className="marca">
-        <div className="marca-avatar">B</div>
-        <span className="marca-nome">Barbearia</span>
-      </div>
+      <Marca />
       <div className="hero">
         <div className="hero-avatar">🔒</div>
         <div>
