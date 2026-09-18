@@ -11,6 +11,7 @@ export type Agendamento = {
   status: 'agendado' | 'concluido' | 'cancelado'
   clienteMensal: boolean
   cortesPagosMes: number
+  cortesUsadosMes: number
 }
 
 export type NovoAgendamento = {
@@ -27,6 +28,7 @@ export type Cliente = {
   nome: string
   mensal: boolean
   cortesPagosMes: number
+  cortesUsadosMes: number
 }
 
 export type Bloqueio = {
@@ -93,7 +95,7 @@ export const api = {
   listarClientes: (pin: string, busca = '') =>
     call<Cliente[]>('listarClientes', { params: { pin, busca } }),
 
-  atualizarStatusCliente: (params: { telefone: string; mensal: boolean; cortesPagosMes: number; pin: string }) =>
+  atualizarStatusCliente: (params: { telefone: string; mensal: boolean; cortesPagosMes: number; cortesUsadosMes: number; pin: string }) =>
     call<void>('atualizarStatusCliente', { method: 'POST', body: params }),
 
   cancelarAgendamento: (params: { id: string; pin: string }) =>

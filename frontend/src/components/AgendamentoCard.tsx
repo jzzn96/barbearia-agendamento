@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { Agendamento } from '../services/api'
 import { buildReminderLink } from '../lib/whatsapp'
+import { PacoteCortes } from './PacoteCortes'
 
 export function AgendamentoCard({
   agendamento,
@@ -9,11 +10,12 @@ export function AgendamentoCard({
 }: {
   agendamento: Agendamento
   onCancelar: (id: string) => void
-  onAtualizarStatus: (telefone: string, mensal: boolean, cortesPagosMes: number) => void
+  onAtualizarStatus: (telefone: string, mensal: boolean, cortesPagosMes: number, cortesUsadosMes: number) => void
 }) {
   const [editando, setEditando] = useState(false)
   const [mensal, setMensal] = useState(agendamento.clienteMensal)
-  const [cortes, setCortes] = useState(agendamento.cortesPagosMes)
+  const [pagos, setPagos] = useState(agendamento.cortesPagosMes)
+  const [usados, setUsados] = useState(agendamento.cortesUsadosMes)
 
   const linkLembrete = buildReminderLink({
     telefone: agendamento.telefoneCliente,
@@ -21,6 +23,8 @@ export function AgendamentoCard({
     data: agendamento.data,
     horario: agendamento.horario,
   })
+
+  const restam = Math.max(0, agendamento.cortesPagosMes - agendamento.cortesUsadosMes)
 
   return (
     <div className="card">
@@ -36,11 +40,7 @@ export function AgendamentoCard({
 
       {!editando && (
         <div className="card-status">
-          {agendamento.clienteMensal ? (
-            <span>🔵 Mensal — {agendamento.cortesPagosMes} cortes pagos</span>
-          ) : (
-            <span>Avulso</span>
-          )}
+          {agendamento.clienteMensal ? <span>🔵 Mensal — restam {restam} cortes</span> : <span>Avulso</span>}
           <button className="link" onClick={() => setEditando(true)}>
             editar
           </button>
@@ -56,19 +56,11 @@ export function AgendamentoCard({
             <input type="checkbox" checked={mensal} onChange={(e) => setMensal(e.target.checked)} />
             Mensal
           </label>
-          {mensal && (
-            <input
-              type="number"
-              min={0}
-              value={cortes}
-              onChange={(e) => setCortes(Number(e.target.value))}
-              style={{ width: 48 }}
-            />
-          )}
+          {mensal && <PacoteCortes pagos={pagos} usados={usados} onChangePagos={setPagos} onChangeUsados={setUsados} />}
           <button
             className="link"
             onClick={() => {
-              onAtualizarStatus(agendamento.telefoneCliente, mensal, cortes)
+              onAtualizarStatus(agendamento.telefoneCliente, mensal, pagos, usados)
               setEditando(false)
             }}
           >

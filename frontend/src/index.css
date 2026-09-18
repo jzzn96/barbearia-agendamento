@@ -302,4 +302,58 @@ button:disabled {
   font-size: 0.88rem;
   padding-top: 10px;
   border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+/* Pacote de cortes (pagos/usados) — steppers simples, sem digitar número */
+.pacote-cortes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.pacote-linha {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pacote-linha span {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.stepper button {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: var(--radius-full);
+  background: var(--surface-2);
+  color: var(--text);
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.stepper strong {
+  min-width: 20px;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+.pacote-restam {
+  margin: 2px 0 0;
+  font-size: 0.82rem;
+  color: var(--success);
+}
+
+.pacote-restam-zerado {
+  color: var(--danger);
 }

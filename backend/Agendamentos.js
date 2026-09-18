@@ -14,7 +14,7 @@ function criarAgendamento(body) {
   if (honeypot) {
     // Campo invisível preenchido = quase certeza de bot. Finge sucesso
     // sem criar nada, pra não dar pista de que foi bloqueado.
-    return { id: 'ignorado', telefoneCliente: telefoneBruto, nomeCliente: nome, data, horario, servico: servicoId, status: 'agendado', clienteMensal: false, cortesPagosMes: 0 }
+    return { id: 'ignorado', telefoneCliente: telefoneBruto, nomeCliente: nome, data, horario, servico: servicoId, status: 'agendado', clienteMensal: false, cortesPagosMes: 0, cortesUsadosMes: 0 }
   }
 
   if (!nome || !telefoneBruto || !data || !horario || !servicoId) {
@@ -55,6 +55,7 @@ function criarAgendamento(body) {
       status: 'agendado',
       clienteMensal: !!cliente.mensal,
       cortesPagosMes: Number(cliente.cortesPagosMes) || 0,
+      cortesUsadosMes: Number(cliente.cortesUsadosMes) || 0,
     }
   } finally {
     lock.releaseLock()
@@ -94,6 +95,7 @@ function listarAgendamentosPorData(data) {
         status: l.status,
         clienteMensal: !!cliente.mensal,
         cortesPagosMes: Number(cliente.cortesPagosMes) || 0,
+        cortesUsadosMes: Number(cliente.cortesUsadosMes) || 0,
       }
     })
 }

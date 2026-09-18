@@ -2,7 +2,11 @@
 // negócio aqui — isso fica em Agendamentos.js e Clientes.js.
 
 const ABA_CLIENTES = 'Clientes'
-const CABECALHO_CLIENTES = ['telefone', 'nome', 'mensal', 'cortesPagosMes', 'mesReferencia', 'criadoEm', 'atualizadoEm']
+// cortesUsadosMes fica no FIM da lista de propósito: colunas novas só podem
+// ser adicionadas no fim da planilha física (ver getAba() abaixo), então o
+// cabeçalho lógico precisa espelhar essa ordem — senão a leitura por índice
+// desalinha com os dados já gravados nas linhas antigas.
+const CABECALHO_CLIENTES = ['telefone', 'nome', 'mensal', 'cortesPagosMes', 'mesReferencia', 'criadoEm', 'atualizadoEm', 'cortesUsadosMes']
 
 const ABA_AGENDAMENTOS = 'Agendamentos'
 const CABECALHO_AGENDAMENTOS = ['id', 'eventoCalendarId', 'telefoneCliente', 'nomeCliente', 'data', 'horario', 'servico', 'duracaoMin', 'status', 'barbeiroId', 'criadoEm']
@@ -22,6 +26,14 @@ function getAba(nome, cabecalho) {
       const idx = cabecalho.indexOf(chave)
       if (idx !== -1) aba.getRange(1, idx + 1, 1000, 1).setNumberFormat('@')
     })
+  } else {
+    // Planilha já existente pode ter sido criada com um CABECALHO_* menor
+    // (ex: coluna nova adicionada depois) — completa o cabeçalho que falta
+    // sem mexer nas colunas/linhas já gravadas.
+    const larguraAtual = aba.getLastColumn()
+    if (larguraAtual < cabecalho.length) {
+      aba.getRange(1, larguraAtual + 1, 1, cabecalho.length - larguraAtual).setValues([cabecalho.slice(larguraAtual)])
+    }
   }
   return aba
 }

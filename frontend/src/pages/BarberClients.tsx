@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { api, ApiError, type Cliente } from '../services/api'
 import { barberSession } from '../services/barberSession'
 import { Marca } from '../components/Marca'
+import { PacoteCortes } from '../components/PacoteCortes'
 
 export default function BarberClients() {
   const [busca, setBusca] = useState('')
@@ -25,7 +26,13 @@ export default function BarberClients() {
 
   async function salvar(c: Cliente) {
     try {
-      await api.atualizarStatusCliente({ telefone: c.telefone, mensal: c.mensal, cortesPagosMes: c.cortesPagosMes, pin })
+      await api.atualizarStatusCliente({
+        telefone: c.telefone,
+        mensal: c.mensal,
+        cortesPagosMes: c.cortesPagosMes,
+        cortesUsadosMes: c.cortesUsadosMes,
+        pin,
+      })
       carregar()
     } catch (e) {
       alert(e instanceof ApiError ? e.message : 'Falha ao salvar.')
@@ -62,16 +69,11 @@ export default function BarberClients() {
               Mensal
             </label>
             {c.mensal && (
-              <input
-                type="number"
-                min={0}
-                value={c.cortesPagosMes}
-                onChange={(e) =>
-                  setClientes((prev) =>
-                    prev.map((x) => (x.telefone === c.telefone ? { ...x, cortesPagosMes: Number(e.target.value) } : x)),
-                  )
-                }
-                style={{ width: 48 }}
+              <PacoteCortes
+                pagos={c.cortesPagosMes}
+                usados={c.cortesUsadosMes}
+                onChangePagos={(v) => setClientes((prev) => prev.map((x) => (x.telefone === c.telefone ? { ...x, cortesPagosMes: v } : x)))}
+                onChangeUsados={(v) => setClientes((prev) => prev.map((x) => (x.telefone === c.telefone ? { ...x, cortesUsadosMes: v } : x)))}
               />
             )}
             <button className="link" onClick={() => salvar(c)}>

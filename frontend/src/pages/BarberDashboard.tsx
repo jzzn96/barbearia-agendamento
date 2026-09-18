@@ -45,9 +45,9 @@ export default function BarberDashboard() {
     }
   }
 
-  async function atualizarStatus(telefone: string, mensal: boolean, cortesPagosMes: number) {
+  async function atualizarStatus(telefone: string, mensal: boolean, cortesPagosMes: number, cortesUsadosMes: number) {
     try {
-      await api.atualizarStatusCliente({ telefone, mensal, cortesPagosMes, pin })
+      await api.atualizarStatusCliente({ telefone, mensal, cortesPagosMes, cortesUsadosMes, pin })
       carregar()
     } catch (e) {
       alert(e instanceof ApiError ? e.message : 'Falha ao salvar.')

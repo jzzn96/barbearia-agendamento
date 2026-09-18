@@ -8,11 +8,12 @@ function normalizarTelefone(telefone) {
   return digitos
 }
 
-// Zera cortesPagosMes sozinho quando o mês vira, sem precisar de trigger
-// agendado (que consumiria cota à toa) — a checagem acontece na leitura.
+// Zera cortesPagosMes/cortesUsadosMes sozinho quando o mês vira, sem
+// precisar de trigger agendado (que consumiria cota à toa) — a checagem
+// acontece na leitura.
 function aplicarResetMensal(cliente) {
   if (cliente.mesReferencia !== mesAtual()) {
-    return Object.assign({}, cliente, { cortesPagosMes: 0 })
+    return Object.assign({}, cliente, { cortesPagosMes: 0, cortesUsadosMes: 0 })
   }
   return cliente
 }
@@ -28,7 +29,7 @@ function buscarOuCriarCliente(telefone, nome) {
   }
 
   const agora = new Date()
-  const novaLinha = [telefone, nome, false, 0, mesAtual(), agora, agora]
+  const novaLinha = [telefone, nome, false, 0, mesAtual(), agora, agora, 0]
   aba.appendRow(novaLinha)
   return objetoDaLinha(CABECALHO_CLIENTES, novaLinha)
 }
@@ -55,6 +56,7 @@ function listarClientes(busca) {
         nome: ajustado.nome,
         mensal: !!ajustado.mensal,
         cortesPagosMes: Number(ajustado.cortesPagosMes) || 0,
+        cortesUsadosMes: Number(ajustado.cortesUsadosMes) || 0,
       }
     })
 }
@@ -63,6 +65,7 @@ function atualizarStatusCliente(body) {
   const telefone = body && body.telefone
   const mensal = body && body.mensal
   const cortesPagosMes = body && body.cortesPagosMes
+  const cortesUsadosMes = body && body.cortesUsadosMes
 
   if (!telefone) throw new Error('Telefone obrigatório.')
 
@@ -70,7 +73,8 @@ function atualizarStatusCliente(body) {
   const valores = aba.getDataRange().getValues()
 
   const idxMensal = CABECALHO_CLIENTES.indexOf('mensal')
-  const idxCortes = CABECALHO_CLIENTES.indexOf('cortesPagosMes')
+  const idxPagos = CABECALHO_CLIENTES.indexOf('cortesPagosMes')
+  const idxUsados = CABECALHO_CLIENTES.indexOf('cortesUsadosMes')
   const idxMesRef = CABECALHO_CLIENTES.indexOf('mesReferencia')
   const idxAtualizado = CABECALHO_CLIENTES.indexOf('atualizadoEm')
 
@@ -78,7 +82,8 @@ function atualizarStatusCliente(body) {
     if (String(valores[i][0]) === telefone) {
       const linha = i + 1
       aba.getRange(linha, idxMensal + 1).setValue(!!mensal)
-      aba.getRange(linha, idxCortes + 1).setValue(Number(cortesPagosMes) || 0)
+      aba.getRange(linha, idxPagos + 1).setValue(Number(cortesPagosMes) || 0)
+      aba.getRange(linha, idxUsados + 1).setValue(Number(cortesUsadosMes) || 0)
       aba.getRange(linha, idxMesRef + 1).setValue(mesAtual())
       aba.getRange(linha, idxAtualizado + 1).setValue(new Date())
       return
