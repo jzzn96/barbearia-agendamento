@@ -357,17 +357,22 @@ button:disabled {
   flex-shrink: 0;
 }
 
-/* Toggle "Cliente mensal" — checkbox real escondido, visual em CSS puro */
-.toggle-mensal {
+/* Toggle switch genérico — checkbox real escondido, visual em CSS puro.
+   .toggle-mensal é um modificador que soma a borda de separação usada
+   quando o toggle vem logo abaixo de outro bloco de conteúdo (cliente). */
+.toggle {
   display: flex;
   align-items: center;
   gap: 10px;
   cursor: pointer;
+}
+
+.toggle-mensal {
   padding-top: 12px;
   border-top: 1px solid var(--border);
 }
 
-.toggle-mensal input {
+.toggle input {
   position: absolute;
   opacity: 0;
   width: 0;
@@ -396,12 +401,12 @@ button:disabled {
   transition: transform 0.15s ease, background 0.15s ease;
 }
 
-.toggle-mensal input:checked + .toggle-track {
+.toggle input:checked + .toggle-track {
   background: color-mix(in srgb, var(--accent) 30%, var(--surface-2));
   border-color: var(--accent);
 }
 
-.toggle-mensal input:checked + .toggle-track .toggle-thumb {
+.toggle input:checked + .toggle-track .toggle-thumb {
   transform: translateX(16px);
   background: var(--accent);
 }
@@ -409,6 +414,50 @@ button:disabled {
 .toggle-label {
   font-size: 0.9rem;
   font-weight: 600;
+}
+
+/* Tela de Bloqueios */
+.bloqueio-horarios {
+  display: flex;
+  gap: 12px;
+}
+
+.bloqueio-campo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bloqueio-campo label {
+  margin-bottom: 0;
+}
+
+.bloqueio-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.bloqueio-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 5px 12px;
+  border-radius: var(--radius-full);
+  width: fit-content;
+}
+
+.btn-remover {
+  width: 100%;
+  background: transparent;
+  border: 1px solid var(--danger);
+  color: var(--danger);
 }
 
 .btn-salvar-cliente {

@@ -72,7 +72,7 @@ export default function BarberClients() {
             </div>
           </div>
 
-          <label className="toggle-mensal">
+          <label className="toggle toggle-mensal">
             <input
               type="checkbox"
               checked={c.mensal}

@@ -83,18 +83,25 @@ export default function BarberBlocks() {
       </div>
 
       <div className="form">
-        <label>
+        <label className="toggle">
           <input type="checkbox" checked={diaTodo} onChange={(e) => setDiaTodo(e.target.checked)} />
-          Bloquear o dia inteiro
+          <span className="toggle-track">
+            <span className="toggle-thumb" />
+          </span>
+          <span className="toggle-label">Bloquear o dia inteiro</span>
         </label>
 
         {!diaTodo && (
-          <>
-            <label htmlFor="bloqueio-inicio">Início</label>
-            <input id="bloqueio-inicio" type="time" value={horarioInicio} onChange={(e) => setHorarioInicio(e.target.value)} />
-            <label htmlFor="bloqueio-fim">Fim</label>
-            <input id="bloqueio-fim" type="time" value={horarioFim} onChange={(e) => setHorarioFim(e.target.value)} />
-          </>
+          <div className="bloqueio-horarios">
+            <div className="bloqueio-campo">
+              <label htmlFor="bloqueio-inicio">Início</label>
+              <input id="bloqueio-inicio" type="time" value={horarioInicio} onChange={(e) => setHorarioInicio(e.target.value)} />
+            </div>
+            <div className="bloqueio-campo">
+              <label htmlFor="bloqueio-fim">Fim</label>
+              <input id="bloqueio-fim" type="time" value={horarioFim} onChange={(e) => setHorarioFim(e.target.value)} />
+            </div>
+          </div>
         )}
 
         <label htmlFor="bloqueio-motivo">Motivo (opcional)</label>
@@ -117,16 +124,12 @@ export default function BarberBlocks() {
       {!carregando && bloqueios.length === 0 && !erro && <p>Nenhum bloqueio nesse dia.</p>}
 
       {bloqueios.map((b) => (
-        <div className="card" key={b.id}>
-          <div className="card-topo">
-            <strong>{b.diaTodo ? 'Dia inteiro' : `${b.horarioInicio} – ${b.horarioFim}`}</strong>
-          </div>
-          <div className="card-sub">{b.titulo}</div>
-          <div className="card-status">
-            <button className="link" onClick={() => remover(b.id)}>
-              remover
-            </button>
-          </div>
+        <div className="card bloqueio-card" key={b.id}>
+          <span className="bloqueio-badge">{b.diaTodo ? '🔒 Dia inteiro' : `🔒 ${b.horarioInicio} – ${b.horarioFim}`}</span>
+          {b.titulo && <div className="card-sub">{b.titulo}</div>}
+          <button className="btn-remover" onClick={() => remover(b.id)}>
+            Remover
+          </button>
         </div>
       ))}
     </div>
