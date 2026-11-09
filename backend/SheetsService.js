@@ -8,6 +8,12 @@ const ABA_CLIENTES = 'Clientes'
 // desalinha com os dados já gravados nas linhas antigas.
 const CABECALHO_CLIENTES = ['telefone', 'nome', 'mensal', 'cortesPagosMes', 'mesReferencia', 'criadoEm', 'atualizadoEm', 'cortesUsadosMes', 'valorMensal']
 
+// Livro de movimentos dos cortes: cada venda de pacote, uso, estorno ou ajuste
+// é UMA linha. O saldo do cliente é a soma da coluna "creditos" dele — nunca
+// um número editado à mão (ver Clientes.js).
+const ABA_MOVIMENTOS = 'Movimentos'
+const CABECALHO_MOVIMENTOS = ['id', 'telefone', 'tipo', 'creditos', 'valor', 'agendamentoId', 'criadoEm']
+
 const ABA_AGENDAMENTOS = 'Agendamentos'
 const CABECALHO_AGENDAMENTOS = ['id', 'eventoCalendarId', 'telefoneCliente', 'nomeCliente', 'data', 'horario', 'servico', 'duracaoMin', 'status', 'barbeiroId', 'criadoEm']
 

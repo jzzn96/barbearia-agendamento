@@ -49,6 +49,22 @@ function executarAcao(action, method, params, body) {
       exigirPin(body.pin)
       return cancelarAgendamento(body.id)
 
+    case 'concluirAtendimento':
+      exigirPin(body.pin)
+      return concluirAtendimento(body.id)
+
+    case 'desfazerAtendimento':
+      exigirPin(body.pin)
+      return desfazerAtendimento(body.id)
+
+    case 'venderPacote':
+      exigirPin(body.pin)
+      return venderPacote(body)
+
+    case 'historicoCliente':
+      exigirPin(body.pin)
+      return historicoCliente(body.telefone)
+
     case 'criarBloqueio':
       exigirPin(body.pin)
       return criarBloqueio(body.data, body.horarioInicio, body.horarioFim, body.motivo, body.diaTodo)

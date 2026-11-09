@@ -10,6 +10,7 @@ export type Agendamento = {
   duracaoMin: number
   status: 'agendado' | 'concluido' | 'cancelado'
   clienteMensal: boolean
+  saldo: number // cortes que o cliente ainda tem (soma do livro de movimentos)
   cortesPagosMes: number
   cortesUsadosMes: number
   valorMensal: number
@@ -28,9 +29,17 @@ export type Cliente = {
   telefone: string
   nome: string
   mensal: boolean
+  saldo: number
   cortesPagosMes: number
   cortesUsadosMes: number
   valorMensal: number
+}
+
+export type Movimento = {
+  data: string // dd/MM/aaaa HH:mm
+  tipo: 'pacote' | 'uso' | 'estorno' | 'ajuste'
+  creditos: number // positivo entra, negativo sai
+  valor: number // R$ pagos (só em pacote)
 }
 
 export type Bloqueio = {
@@ -97,15 +106,22 @@ export const api = {
   listarClientes: (pin: string, busca = '') =>
     call<Cliente[]>('listarClientes', { params: { pin, busca } }),
 
-  atualizarStatusCliente: (params: {
-    telefone: string
-    mensal: boolean
-    cortesPagosMes: number
-    cortesUsadosMes: number
-    valorMensal: number
-    pin: string
-  }) =>
+  // Só "mensal" e "valorMensal": os cortes agora mudam por atendimento,
+  // pacote vendido ou ajuste, nunca por número digitado.
+  atualizarStatusCliente: (params: { telefone: string; mensal: boolean; valorMensal: number; pin: string }) =>
     call<void>('atualizarStatusCliente', { method: 'POST', body: params }),
+
+  concluirAtendimento: (params: { id: string; pin: string }) =>
+    call<{ usouCredito: boolean; jaConcluido: boolean; saldo: number }>('concluirAtendimento', { method: 'POST', body: params }),
+
+  desfazerAtendimento: (params: { id: string; pin: string }) =>
+    call<{ saldo: number }>('desfazerAtendimento', { method: 'POST', body: params }),
+
+  venderPacote: (params: { telefone: string; creditos: number; valor: number; pin: string }) =>
+    call<{ saldo: number }>('venderPacote', { method: 'POST', body: params }),
+
+  historicoCliente: (params: { telefone: string; pin: string }) =>
+    call<Movimento[]>('historicoCliente', { method: 'POST', body: params }),
 
   cancelarAgendamento: (params: { id: string; pin: string }) =>
     call<void>('cancelarAgendamento', { method: 'POST', body: params }),

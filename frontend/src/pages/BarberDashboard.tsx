@@ -36,12 +36,24 @@ export default function BarberDashboard() {
     }
   }
 
-  async function atualizarStatus(telefone: string, mensal: boolean, cortesPagosMes: number, cortesUsadosMes: number, valorMensal: number) {
+  async function concluir(a: Agendamento) {
     try {
-      await api.atualizarStatusCliente({ telefone, mensal, cortesPagosMes, cortesUsadosMes, valorMensal, pin })
+      const resultado = await api.concluirAtendimento({ id: a.id, pin })
+      carregar()
+      if (!resultado.usouCredito && a.clienteMensal) {
+        alert(`${a.nomeCliente} está sem cortes no saldo. Atendimento marcado como feito, sem descontar nada.`)
+      }
+    } catch (e) {
+      alert(e instanceof ApiError ? e.message : 'Falha ao marcar como atendido.')
+    }
+  }
+
+  async function desfazer(a: Agendamento) {
+    try {
+      await api.desfazerAtendimento({ id: a.id, pin })
       carregar()
     } catch (e) {
-      alert(e instanceof ApiError ? e.message : 'Falha ao salvar.')
+      alert(e instanceof ApiError ? e.message : 'Falha ao desfazer.')
     }
   }
 
@@ -79,7 +91,7 @@ export default function BarberDashboard() {
 
       <div className="lista">
         {agendamentos.map((a) => (
-          <AgendamentoCard key={a.id} agendamento={a} onCancelar={cancelar} onAtualizarStatus={atualizarStatus} />
+          <AgendamentoCard key={a.id} agendamento={a} onCancelar={cancelar} onConcluir={concluir} onDesfazer={desfazer} />
         ))}
       </div>
     </div>

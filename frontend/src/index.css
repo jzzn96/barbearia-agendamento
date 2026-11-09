@@ -801,6 +801,67 @@ input[type='time'] {
   color: var(--ouro-claro);
 }
 
+/* Atendimento já feito: hora apagada, cartão discreto */
+.ag.concluido .ag-hora strong {
+  color: var(--suave);
+}
+
+.ag.concluido h3 {
+  color: var(--suave);
+}
+
+.selo-ok {
+  border-color: var(--ok);
+  color: var(--ok);
+}
+
+/* Histórico de cortes do cliente */
+.historico {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background: var(--noir);
+  border: 1px solid var(--linha);
+  border-radius: var(--raio);
+}
+
+.historico li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+}
+
+.historico li + li {
+  border-top: 1px solid var(--linha);
+}
+
+.historico small {
+  display: block;
+  color: var(--suave);
+  font-size: 0.74rem;
+}
+
+.historico .entrou {
+  color: var(--ok);
+}
+
+.historico .saiu {
+  color: var(--perigo);
+}
+
+.cliente-plano {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--linha);
+}
+
 /* Cartão de cliente */
 .cliente {
   display: flex;
