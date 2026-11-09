@@ -19,6 +19,8 @@ export function ClienteCard({ cliente, pin, onAtualizado }: { cliente: Cliente; 
   const [valorPacote, setValorPacote] = useState(cliente.valorMensal)
   const [historico, setHistorico] = useState<Movimento[] | null>(null)
   const [ocupado, setOcupado] = useState(false)
+  const [editandoNome, setEditandoNome] = useState(false)
+  const [nome, setNome] = useState(cliente.nome)
 
   async function executar(acao: () => Promise<void>, falha: string) {
     setOcupado(true)
@@ -34,6 +36,13 @@ export function ClienteCard({ cliente, pin, onAtualizado }: { cliente: Cliente; 
 
   function salvarPlano() {
     return executar(() => api.atualizarStatusCliente({ telefone: cliente.telefone, mensal, valorMensal, pin }), 'Falha ao salvar.')
+  }
+
+  function salvarNome() {
+    return executar(async () => {
+      await api.atualizarNomeCliente({ telefone: cliente.telefone, nome: nome.trim(), pin })
+      setEditandoNome(false)
+    }, 'Falha ao salvar o nome.')
   }
 
   function confirmarVenda() {
@@ -66,7 +75,22 @@ export function ClienteCard({ cliente, pin, onAtualizado }: { cliente: Cliente; 
           <strong>{cliente.nome}</strong>
           <span>{formatPhoneDisplay(cliente.telefone)}</span>
         </div>
+        <button type="button" className="btn btn-contorno btn-pequeno cliente-editar" onClick={() => setEditandoNome((v) => !v)}>
+          {editandoNome ? 'Cancelar' : 'Editar nome'}
+        </button>
       </div>
+
+      {editandoNome && (
+        <div className="pacote">
+          <div className="campo">
+            <label htmlFor={`nome-${cliente.telefone}`}>Nome do cliente</label>
+            <input id={`nome-${cliente.telefone}`} maxLength={80} value={nome} onChange={(e) => setNome(e.target.value)} />
+          </div>
+          <button type="button" className="btn btn-principal btn-bloco" disabled={ocupado || !nome.trim()} onClick={salvarNome}>
+            Salvar nome
+          </button>
+        </div>
+      )}
 
       <SaldoCortes comprados={cliente.cortesPagosMes} saldo={cliente.saldo} />
 

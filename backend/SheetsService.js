@@ -15,7 +15,9 @@ const ABA_MOVIMENTOS = 'Movimentos'
 const CABECALHO_MOVIMENTOS = ['id', 'telefone', 'tipo', 'creditos', 'valor', 'agendamentoId', 'criadoEm']
 
 const ABA_AGENDAMENTOS = 'Agendamentos'
-const CABECALHO_AGENDAMENTOS = ['id', 'eventoCalendarId', 'telefoneCliente', 'nomeCliente', 'data', 'horario', 'servico', 'duracaoMin', 'status', 'barbeiroId', 'criadoEm']
+// nomeInformado fica no FIM (mesma regra das colunas novas): guarda o nome
+// que a pessoa digitou quando ele é diferente do nome cadastrado no telefone.
+const CABECALHO_AGENDAMENTOS = ['id', 'eventoCalendarId', 'telefoneCliente', 'nomeCliente', 'data', 'horario', 'servico', 'duracaoMin', 'status', 'barbeiroId', 'criadoEm', 'nomeInformado']
 
 // Cria a aba com cabeçalho na primeira vez que for usada — não precisa
 // preparar a planilha manualmente antes de rodar, só criar uma em branco.

@@ -765,6 +765,18 @@ input[type='time'] {
   overflow-wrap: anywhere;
 }
 
+.ag-nota {
+  color: var(--ouro-claro);
+  font-size: 0.8rem;
+  font-style: italic;
+  overflow-wrap: anywhere;
+}
+
+.cliente-editar {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
 .sem-quebra {
   white-space: nowrap;
 }

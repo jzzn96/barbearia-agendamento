@@ -57,6 +57,10 @@ function executarAcao(action, method, params, body) {
       exigirPin(body.pin)
       return desfazerAtendimento(body.id)
 
+    case 'atualizarNomeCliente':
+      exigirPin(body.pin)
+      return atualizarNomeCliente(body)
+
     case 'venderPacote':
       exigirPin(body.pin)
       return venderPacote(body)

@@ -3,7 +3,8 @@ const BASE_URL = import.meta.env.VITE_APPS_SCRIPT_URL as string | undefined
 export type Agendamento = {
   id: string
   telefoneCliente: string
-  nomeCliente: string
+  nomeCliente: string // nome do cadastro do telefone
+  nomeInformado?: string // o que a pessoa digitou, só quando difere do cadastro
   data: string // AAAA-MM-DD
   horario: string // HH:mm
   servico: string
@@ -110,6 +111,9 @@ export const api = {
   // pacote vendido ou ajuste, nunca por número digitado.
   atualizarStatusCliente: (params: { telefone: string; mensal: boolean; valorMensal: number; pin: string }) =>
     call<void>('atualizarStatusCliente', { method: 'POST', body: params }),
+
+  atualizarNomeCliente: (params: { telefone: string; nome: string; pin: string }) =>
+    call<{ nome: string }>('atualizarNomeCliente', { method: 'POST', body: params }),
 
   concluirAtendimento: (params: { id: string; pin: string }) =>
     call<{ usouCredito: boolean; jaConcluido: boolean; saldo: number }>('concluirAtendimento', { method: 'POST', body: params }),

@@ -45,6 +45,7 @@ export function AgendamentoCard({
         <p className="ag-sub">
           {agendamento.servico} · <span className="sem-quebra">{formatPhoneDisplay(agendamento.telefoneCliente)}</span>
         </p>
+        {agendamento.nomeInformado && <p className="ag-nota">Digitou “{agendamento.nomeInformado}” neste telefone</p>}
 
         <div className="ag-acoes">
           {!concluido && (

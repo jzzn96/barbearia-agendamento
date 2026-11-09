@@ -37,18 +37,25 @@ function criarAgendamento(body) {
       throw new Error('Esse horário acabou de ser preenchido, escolha outro.')
     }
 
-    const eventoId = criarEventoCalendar(data, horario, nome, telefone, servico.nome, servico.duracaoMin)
-    const cliente = buscarOuCriarCliente(telefone, nome)
+    // O telefone é quem identifica o cliente: se ele já tem cadastro, o NOME
+    // CADASTRADO vale (Agenda, painel, histórico). O que a pessoa digitou só
+    // fica guardado à parte quando é diferente, pro barbeiro ver. Na primeira
+    // marcação de um número, o nome digitado vira o cadastro.
+    const cliente = buscarOuCriarCliente(telefone, nome.trim())
+    const nomeFinal = String(cliente.nome || nome).trim()
+    const nomeInformado = mesmoNome(nomeFinal, nome) ? '' : nome.trim()
+
+    const eventoId = criarEventoCalendar(data, horario, nomeFinal, telefone, servico.nome, servico.duracaoMin)
 
     const id = Utilities.getUuid()
     const aba = getAba(ABA_AGENDAMENTOS, CABECALHO_AGENDAMENTOS)
-    aba.appendRow([id, eventoId, telefone, nome, data, horario, servico.nome, servico.duracaoMin, 'agendado', BARBEIRO_ID, new Date()])
+    aba.appendRow([id, eventoId, telefone, nomeFinal, data, horario, servico.nome, servico.duracaoMin, 'agendado', BARBEIRO_ID, new Date(), nomeInformado])
 
     return Object.assign(
       {
         id,
         telefoneCliente: telefone,
-        nomeCliente: nome,
+        nomeCliente: nomeFinal,
         data,
         horario,
         servico: servico.nome,
@@ -62,6 +69,18 @@ function criarAgendamento(body) {
   } finally {
     lock.releaseLock()
   }
+}
+
+// "Rafael" e " rafael " são o mesmo nome; sem acento e sem maiúscula.
+function mesmoNome(a, b) {
+  const limpar = (t) =>
+    String(t)
+      .normalize('NFD')
+      .replace(/[̀-ͯ]/g, '')
+      .toLowerCase()
+      .replace(/\s+/g, ' ')
+      .trim()
+  return limpar(a) === limpar(b)
 }
 
 // Anti-abuso simples: mesmo telefone não marca de novo em menos de 5min.
@@ -89,7 +108,9 @@ function listarAgendamentosPorData(data) {
       return {
         id: l.id,
         telefoneCliente: l.telefoneCliente,
-        nomeCliente: l.nomeCliente,
+        // Nome do cadastro (muda na hora se o barbeiro renomear o cliente).
+        nomeCliente: cliente.nome || l.nomeCliente,
+        nomeInformado: l.nomeInformado ? String(l.nomeInformado) : '',
         data: l.data,
         horario: l.horario,
         servico: l.servico,

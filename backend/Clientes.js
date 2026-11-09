@@ -172,6 +172,31 @@ function atualizarStatusCliente(body) {
   throw new Error('Cliente não encontrado.')
 }
 
+// Corrige o nome do cadastro (o nome que vale em toda a agenda do painel).
+function atualizarNomeCliente(body) {
+  const telefone = body && body.telefone
+  const nome = String((body && body.nome) || '').trim()
+
+  if (!telefone) throw new Error('Telefone obrigatório.')
+  if (!nome) throw new Error('Informe o nome.')
+  if (nome.length > 80) throw new Error('Nome muito longo (máximo 80 letras).')
+
+  const aba = getAba(ABA_CLIENTES, CABECALHO_CLIENTES)
+  const valores = aba.getDataRange().getValues()
+  const idxNome = CABECALHO_CLIENTES.indexOf('nome')
+  const idxAtualizado = CABECALHO_CLIENTES.indexOf('atualizadoEm')
+
+  for (let i = 1; i < valores.length; i++) {
+    if (String(valores[i][0]) === telefone) {
+      aba.getRange(i + 1, idxNome + 1).setValue(nome)
+      aba.getRange(i + 1, idxAtualizado + 1).setValue(new Date())
+      return { nome: nome }
+    }
+  }
+
+  throw new Error('Cliente não encontrado.')
+}
+
 // Soma créditos ao saldo: o barbeiro vendeu um pacote.
 function venderPacote(body) {
   const telefone = body && body.telefone
