@@ -18,11 +18,34 @@ function getConfig() {
   return config
 }
 
-// Expediente e duração de cada horário — ajustar aqui conforme a rotina
-// real da barbearia (não tem intervalo de almoço ainda, ver TODO no README).
-const HORARIO_INICIO_H = 9 // 09:00
-const HORARIO_FIM_H = 19 // 19:00
+// Expediente por dia da semana (0 = domingo ... 6 = sábado). Dia que não
+// aparece aqui é FECHADO: nenhum horário é oferecido e o servidor recusa
+// agendamento. "fim" é a hora em que a barbearia fecha (o último horário
+// que cabe termina nela). Não tem intervalo de almoço (ver README).
+const EXPEDIENTE = {
+  2: { inicio: '09:00', fim: '20:00' }, // terça
+  3: { inicio: '09:00', fim: '20:00' }, // quarta
+  4: { inicio: '09:00', fim: '20:00' }, // quinta
+  5: { inicio: '09:00', fim: '20:00' }, // sexta
+  6: { inicio: '08:00', fim: '16:00' }, // sábado
+}
 const DURACAO_SLOT_MIN = 30
+
+// Dia da semana de uma data AAAA-MM-DD (0 = domingo). Usa UTC de propósito:
+// não depende do fuso do script nem do horário de verão.
+function diaDaSemana(data) {
+  const partes = String(data).split('-').map(Number)
+  return new Date(Date.UTC(partes[0], partes[1] - 1, partes[2])).getUTCDay()
+}
+
+function expedienteDoDia(data) {
+  return EXPEDIENTE[diaDaSemana(data)] || null
+}
+
+function paraMinutos(hhmm) {
+  const partes = hhmm.split(':').map(Number)
+  return partes[0] * 60 + partes[1]
+}
 
 const BARBEIRO_ID = 'barbeiro-1'
 

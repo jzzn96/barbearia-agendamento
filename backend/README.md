@@ -69,10 +69,24 @@ salvar o arquivo não atualiza a versão pública.
 | `atualizarStatusCliente` | POST | `pin` |
 | `cancelarAgendamento` | POST | `pin` |
 
+## Expediente e PIN
+
+- **Dias e horários** ficam em `EXPEDIENTE` no `Config.js`, por dia da
+  semana (0 = domingo ... 6 = sábado). Dia que não está na lista é
+  fechado: não aparece horário e o servidor recusa agendamento. Hoje:
+  terça a sexta 09h–20h, sábado 08h–16h. Horário que já passou no dia de
+  hoje também não é oferecido.
+- **PIN:** use 6 dígitos ou mais. Depois de 5 erros seguidos o painel fica
+  bloqueado por 15 minutos (inclusive pro barbeiro, ver `exigirPin()` em
+  `Code.js`).
+
 ## TODOs conhecidos (não bloqueiam o piloto)
 
 - Sem intervalo de almoço no expediente (`Config.js`) — se a barbearia
   fechar meio-dia, ajustar `gerarSlots()` em `CalendarService.js`.
+- O PIN ainda viaja na URL nas consultas (GET). Migrar o painel pra POST
+  exige mudar o front junto (`services/api.ts`) e reimplantar o backend
+  antes.
 - `rejeitarSpam` é uma checagem simples (mesmo telefone, 5 min) — não é
   CAPTCHA. Suficiente pro piloto, revisar se abuso real aparecer.
 - PIN é proteção leve, não é autenticação de verdade — ver ressalva no

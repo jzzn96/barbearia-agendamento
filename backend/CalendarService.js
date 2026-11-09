@@ -8,6 +8,11 @@ function horariosDisponiveis(data, servicoId) {
   if (!data) throw new Error('Parâmetro "data" obrigatório (AAAA-MM-DD).')
   const duracaoMin = resolverServico(servicoId).duracaoMin
 
+  // Dia fechado (ex: domingo e segunda): nada a oferecer, nem precisa
+  // consultar a Agenda.
+  const slots = gerarSlots(data)
+  if (slots.length === 0) return []
+
   const config = getConfig()
   const calendar = CalendarApp.getCalendarById(config.calendarId)
   if (!calendar) throw new Error('Agenda não encontrada — confira CALENDAR_ID nas Propriedades do Script.')
@@ -29,10 +34,14 @@ function horariosDisponiveis(data, servicoId) {
     }
   })
 
-  const slots = gerarSlots()
   const passosNecessarios = Math.ceil(duracaoMin / DURACAO_SLOT_MIN)
 
-  return slots.filter((_, i) => {
+  // Hoje, horário que já passou não pode ser marcado.
+  const hojeSP = Utilities.formatDate(new Date(), 'America/Sao_Paulo', 'yyyy-MM-dd')
+  const agoraSP = Utilities.formatDate(new Date(), 'America/Sao_Paulo', 'HH:mm')
+
+  return slots.filter((slotInicial, i) => {
+    if (data === hojeSP && slotInicial <= agoraSP) return false
     for (let p = 0; p < passosNecessarios; p++) {
       const slot = slots[i + p]
       if (slot === undefined || ocupados.has(slot)) return false
@@ -41,9 +50,13 @@ function horariosDisponiveis(data, servicoId) {
   })
 }
 
-function gerarSlots() {
+// Horários do dia, de 30 em 30 min, dentro do expediente. Dia fechado = [].
+function gerarSlots(data) {
+  const expediente = expedienteDoDia(data)
+  if (!expediente) return []
+
   const slots = []
-  for (let min = HORARIO_INICIO_H * 60; min < HORARIO_FIM_H * 60; min += DURACAO_SLOT_MIN) {
+  for (let min = paraMinutos(expediente.inicio); min < paraMinutos(expediente.fim); min += DURACAO_SLOT_MIN) {
     slots.push(`${pad(Math.floor(min / 60))}:${pad(min % 60)}`)
   }
   return slots
