@@ -765,6 +765,17 @@ input[type='time'] {
   overflow-wrap: anywhere;
 }
 
+.aviso-venda {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  background: rgba(201, 162, 75, 0.08);
+  border: 1px solid var(--ouro);
+  border-radius: var(--raio);
+  font-size: 0.92rem;
+}
+
 .ag-nota {
   color: var(--ouro-claro);
   font-size: 0.8rem;

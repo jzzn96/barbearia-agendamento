@@ -19,6 +19,7 @@ export function ClienteCard({ cliente, pin, onAtualizado }: { cliente: Cliente; 
   const [valorPacote, setValorPacote] = useState(cliente.valorMensal)
   const [historico, setHistorico] = useState<Movimento[] | null>(null)
   const [ocupado, setOcupado] = useState(false)
+  const [confirmandoVenda, setConfirmandoVenda] = useState(false)
   const [editandoNome, setEditandoNome] = useState(false)
   const [nome, setNome] = useState(cliente.nome)
 
@@ -45,10 +46,21 @@ export function ClienteCard({ cliente, pin, onAtualizado }: { cliente: Cliente; 
     }, 'Falha ao salvar o nome.')
   }
 
-  function confirmarVenda() {
+  // Trava leve: com saldo sobrando, o app pergunta antes de somar (evita venda
+  // em duplicidade por toque errado) mas não impede uma renovação antecipada.
+  function pedirVenda() {
+    if (cliente.saldo > 0) {
+      setConfirmandoVenda(true)
+      return
+    }
+    return registrarVenda()
+  }
+
+  function registrarVenda() {
     return executar(async () => {
       await api.venderPacote({ telefone: cliente.telefone, creditos, valor: valorPacote, pin })
       setVendendo(false)
+      setConfirmandoVenda(false)
       setHistorico(null)
     }, 'Falha ao registrar o pacote.')
   }
@@ -118,9 +130,27 @@ export function ClienteCard({ cliente, pin, onAtualizado }: { cliente: Cliente; 
             </div>
           </div>
           <CampoValorMensal valor={valorPacote} onChange={setValorPacote} rotulo="Valor pago" />
-          <button type="button" className="btn btn-principal btn-bloco" disabled={ocupado} onClick={confirmarVenda}>
-            Confirmar venda de {creditos} corte{creditos === 1 ? '' : 's'}
-          </button>
+
+          {confirmandoVenda ? (
+            <div className="aviso-venda" role="alert">
+              <p>
+                {cliente.nome} ainda tem {cliente.saldo} corte{cliente.saldo === 1 ? '' : 's'}. Somar mais {creditos} deixa o saldo em{' '}
+                {cliente.saldo + creditos}.
+              </p>
+              <div className="ag-acoes">
+                <button type="button" className="btn btn-principal btn-pequeno" disabled={ocupado} onClick={registrarVenda}>
+                  Somar mesmo assim
+                </button>
+                <button type="button" className="btn btn-contorno btn-pequeno" onClick={() => setConfirmandoVenda(false)}>
+                  Voltar
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button type="button" className="btn btn-principal btn-bloco" disabled={ocupado} onClick={pedirVenda}>
+              Confirmar venda de {creditos} corte{creditos === 1 ? '' : 's'}
+            </button>
+          )}
         </div>
       )}
 
