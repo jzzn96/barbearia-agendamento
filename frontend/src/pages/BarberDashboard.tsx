@@ -1,19 +1,10 @@
 import { useEffect, useState } from 'react'
 import { api, ApiError, type Agendamento } from '../services/api'
 import { barberSession } from '../services/barberSession'
+import { diaMesLongo, diaSemanaLongo, hoje, somaDias } from '../lib/datas'
 import { AgendamentoCard } from '../components/AgendamentoCard'
-import { Marca } from '../components/Marca'
 import { PainelNav } from '../components/PainelNav'
-
-function hoje(): string {
-  return new Date().toISOString().slice(0, 10)
-}
-
-function somaDias(data: string, delta: number): string {
-  const d = new Date(`${data}T00:00:00`)
-  d.setDate(d.getDate() + delta)
-  return d.toISOString().slice(0, 10)
-}
+import { IconeSetaDir, IconeSetaEsq } from '../components/Icones'
 
 export default function BarberDashboard() {
   const [data, setData] = useState(hoje())
@@ -55,24 +46,42 @@ export default function BarberDashboard() {
   }
 
   return (
-    <div className="tela">
-      <Marca />
+    <div className="app app-painel">
       <PainelNav titulo="Agenda" />
 
-      <div className="nav-data">
-        <button onClick={() => setData(somaDias(data, -1))}>◂</button>
-        <strong>{new Date(`${data}T00:00:00`).toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit' })}</strong>
-        <button onClick={() => setData(somaDias(data, 1))}>▸</button>
-        <button onClick={() => setData(hoje())}>Hoje</button>
+      <div className="seletor-data">
+        <button type="button" className="seta" aria-label="Dia anterior" onClick={() => setData(somaDias(data, -1))}>
+          <IconeSetaEsq />
+        </button>
+        <div className="seletor-label">
+          <strong>{diaSemanaLongo(data)}</strong>
+          <span>{diaMesLongo(data)}</span>
+        </div>
+        <button type="button" className="seta" aria-label="Próximo dia" onClick={() => setData(somaDias(data, 1))}>
+          <IconeSetaDir />
+        </button>
+        <button type="button" className="chip-hoje" disabled={data === hoje()} onClick={() => setData(hoje())}>
+          Hoje
+        </button>
       </div>
 
-      {carregando && <p>Carregando...</p>}
-      {erro && <p className="erro">{erro}</p>}
-      {!carregando && agendamentos.length === 0 && !erro && <p>Nenhum agendamento nesse dia.</p>}
+      {erro && <p className="erro" style={{ marginTop: 16 }}>{erro}</p>}
 
-      {agendamentos.map((a) => (
-        <AgendamentoCard key={a.id} agendamento={a} onCancelar={cancelar} onAtualizarStatus={atualizarStatus} />
-      ))}
+      {!erro && (
+        <p className="resumo">
+          {carregando
+            ? 'Carregando...'
+            : agendamentos.length === 0
+              ? 'Nenhum atendimento neste dia'
+              : `${agendamentos.length} atendimento${agendamentos.length === 1 ? '' : 's'}`}
+        </p>
+      )}
+
+      <div className="lista">
+        {agendamentos.map((a) => (
+          <AgendamentoCard key={a.id} agendamento={a} onCancelar={cancelar} onAtualizarStatus={atualizarStatus} />
+        ))}
+      </div>
     </div>
   )
 }

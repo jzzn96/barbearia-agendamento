@@ -1,18 +1,9 @@
 import { useEffect, useState } from 'react'
 import { api, ApiError, type Bloqueio } from '../services/api'
 import { barberSession } from '../services/barberSession'
-import { Marca } from '../components/Marca'
+import { diaMesLongo, diaSemanaLongo, hoje, somaDias } from '../lib/datas'
 import { PainelNav } from '../components/PainelNav'
-
-function hoje(): string {
-  return new Date().toISOString().slice(0, 10)
-}
-
-function somaDias(data: string, delta: number): string {
-  const d = new Date(`${data}T00:00:00`)
-  d.setDate(d.getDate() + delta)
-  return d.toISOString().slice(0, 10)
-}
+import { IconeBloqueio, IconeSetaDir, IconeSetaEsq } from '../components/Icones'
 
 export default function BarberBlocks() {
   const [data, setData] = useState(hoje())
@@ -65,67 +56,80 @@ export default function BarberBlocks() {
   }
 
   return (
-    <div className="tela">
-      <Marca />
+    <div className="app app-painel">
       <PainelNav titulo="Bloqueios" />
 
-      <div className="nav-data">
-        <button onClick={() => setData(somaDias(data, -1))}>◂</button>
-        <strong>{new Date(`${data}T00:00:00`).toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit' })}</strong>
-        <button onClick={() => setData(somaDias(data, 1))}>▸</button>
-        <button onClick={() => setData(hoje())}>Hoje</button>
+      <div className="seletor-data">
+        <button type="button" className="seta" aria-label="Dia anterior" onClick={() => setData(somaDias(data, -1))}>
+          <IconeSetaEsq />
+        </button>
+        <div className="seletor-label">
+          <strong>{diaSemanaLongo(data)}</strong>
+          <span>{diaMesLongo(data)}</span>
+        </div>
+        <button type="button" className="seta" aria-label="Próximo dia" onClick={() => setData(somaDias(data, 1))}>
+          <IconeSetaDir />
+        </button>
+        <button type="button" className="chip-hoje" disabled={data === hoje()} onClick={() => setData(hoje())}>
+          Hoje
+        </button>
       </div>
 
+      <h2 className="secao">Novo bloqueio</h2>
       <div className="form">
         <label className="toggle">
           <input type="checkbox" checked={diaTodo} onChange={(e) => setDiaTodo(e.target.checked)} />
-          <span className="toggle-track">
-            <span className="toggle-thumb" />
+          <span className="toggle-trilho">
+            <span className="toggle-bola" />
           </span>
-          <span className="toggle-label">Bloquear o dia inteiro</span>
+          <span className="toggle-texto">Bloquear o dia inteiro</span>
         </label>
 
         {!diaTodo && (
-          <div className="bloqueio-horarios">
-            <div className="bloqueio-campo">
+          <div className="horas-par">
+            <div className="campo">
               <label htmlFor="bloqueio-inicio">Início</label>
               <input id="bloqueio-inicio" type="time" value={horarioInicio} onChange={(e) => setHorarioInicio(e.target.value)} />
             </div>
-            <div className="bloqueio-campo">
+            <div className="campo">
               <label htmlFor="bloqueio-fim">Fim</label>
               <input id="bloqueio-fim" type="time" value={horarioFim} onChange={(e) => setHorarioFim(e.target.value)} />
             </div>
           </div>
         )}
 
-        <label htmlFor="bloqueio-motivo">Motivo (opcional)</label>
-        <input
-          id="bloqueio-motivo"
-          placeholder="Ex: Almoço, compromisso pessoal..."
-          value={motivo}
-          onChange={(e) => setMotivo(e.target.value)}
-        />
+        <div className="campo">
+          <label htmlFor="bloqueio-motivo">Motivo (opcional)</label>
+          <input id="bloqueio-motivo" placeholder="Ex: almoço, compromisso pessoal" value={motivo} onChange={(e) => setMotivo(e.target.value)} />
+        </div>
 
         {erro && <p className="erro">{erro}</p>}
 
-        <button disabled={salvando} onClick={bloquear}>
+        <button type="button" className="btn btn-principal btn-bloco" disabled={salvando} onClick={bloquear}>
           {salvando ? 'Bloqueando...' : 'Bloquear'}
         </button>
       </div>
 
-      <h2>Bloqueios do dia</h2>
-      {carregando && <p>Carregando...</p>}
-      {!carregando && bloqueios.length === 0 && !erro && <p>Nenhum bloqueio nesse dia.</p>}
+      <h2 className="secao">Bloqueios do dia</h2>
+      {carregando && <p className="aviso">Carregando...</p>}
+      {!carregando && bloqueios.length === 0 && !erro && <p className="aviso">Nenhum bloqueio neste dia.</p>}
 
-      {bloqueios.map((b) => (
-        <div className="card bloqueio-card" key={b.id}>
-          <span className="bloqueio-badge">{b.diaTodo ? '🔒 Dia inteiro' : `🔒 ${b.horarioInicio} – ${b.horarioFim}`}</span>
-          {b.titulo && <div className="card-sub">{b.titulo}</div>}
-          <button className="btn-remover" onClick={() => remover(b.id)}>
-            Remover
-          </button>
-        </div>
-      ))}
+      <div className="lista">
+        {bloqueios.map((b) => (
+          <div className="bloqueio" key={b.id}>
+            <div className="bloqueio-info">
+              <IconeBloqueio />
+              <div>
+                <strong>{b.diaTodo ? 'Dia inteiro' : `${b.horarioInicio} – ${b.horarioFim}`}</strong>
+                {b.titulo && <span>{b.titulo}</span>}
+              </div>
+            </div>
+            <button type="button" className="btn btn-perigo btn-pequeno" onClick={() => remover(b.id)}>
+              Remover
+            </button>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }

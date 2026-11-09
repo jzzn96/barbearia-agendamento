@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { api, ApiError, type Cliente } from '../services/api'
 import { barberSession } from '../services/barberSession'
 import { formatPhoneDisplay } from '../lib/phone'
-import { Marca } from '../components/Marca'
 import { PainelNav } from '../components/PainelNav'
 import { PacoteCortes } from '../components/PacoteCortes'
 import { CampoValorMensal } from '../components/CampoValorMensal'
@@ -17,6 +16,7 @@ export default function BarberClients() {
 
   function carregar() {
     setCarregando(true)
+    setErro('')
     api
       .listarClientes(pin, busca)
       .then(setClientes)
@@ -25,6 +25,10 @@ export default function BarberClients() {
   }
 
   useEffect(carregar, [busca]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  function alterar(telefone: string, mudanca: Partial<Cliente>) {
+    setClientes((prev) => prev.map((x) => (x.telefone === telefone ? { ...x, ...mudanca } : x)))
+  }
 
   async function salvar(c: Cliente) {
     try {
@@ -43,63 +47,58 @@ export default function BarberClients() {
   }
 
   return (
-    <div className="tela">
-      <Marca />
+    <div className="app app-painel">
       <PainelNav titulo="Clientes" />
 
-      <input className="input-busca" placeholder="Buscar por nome ou telefone" value={busca} onChange={(e) => setBusca(e.target.value)} />
+      <div className="campo busca">
+        <label htmlFor="campo-busca">Buscar</label>
+        <input id="campo-busca" type="search" placeholder="Nome ou telefone" value={busca} onChange={(e) => setBusca(e.target.value)} />
+      </div>
 
-      {carregando && <p>Carregando...</p>}
-      {erro && <p className="erro">{erro}</p>}
+      {erro && <p className="erro" style={{ marginTop: 16 }}>{erro}</p>}
+      <p className="resumo">
+        {carregando ? 'Carregando...' : clientes.length === 0 ? 'Nenhum cliente encontrado' : `${clientes.length} cliente${clientes.length === 1 ? '' : 's'}`}
+      </p>
 
-      {clientes.map((c) => (
-        <div className="card cliente-card" key={c.telefone}>
-          <div className="cliente-topo">
-            <div className="cliente-avatar">{c.nome.charAt(0).toUpperCase()}</div>
-            <div className="cliente-dados">
-              <div className="cliente-linha">
-                <span className="cliente-label">Nome</span>
-                <strong>{c.nome}</strong>
+      <div className="lista">
+        {clientes.map((c) => (
+          <article className="cliente" key={c.telefone}>
+            <div className="cliente-topo">
+              <div className="cliente-avatar" aria-hidden="true">
+                {c.nome.charAt(0).toUpperCase()}
               </div>
-              <div className="cliente-linha">
-                <span className="cliente-label">Tel</span>
+              <div className="cliente-dados">
+                <strong>{c.nome}</strong>
                 <span>{formatPhoneDisplay(c.telefone)}</span>
               </div>
             </div>
-          </div>
 
-          <label className="toggle toggle-mensal">
-            <input
-              type="checkbox"
-              checked={c.mensal}
-              onChange={(e) => setClientes((prev) => prev.map((x) => (x.telefone === c.telefone ? { ...x, mensal: e.target.checked } : x)))}
-            />
-            <span className="toggle-track">
-              <span className="toggle-thumb" />
-            </span>
-            <span className="toggle-label">Cliente mensal</span>
-          </label>
+            <label className="toggle">
+              <input type="checkbox" checked={c.mensal} onChange={(e) => alterar(c.telefone, { mensal: e.target.checked })} />
+              <span className="toggle-trilho">
+                <span className="toggle-bola" />
+              </span>
+              <span className="toggle-texto">Cliente mensal</span>
+            </label>
 
-          {c.mensal && (
-            <>
-              <CampoValorMensal
-                valor={c.valorMensal}
-                onChange={(v) => setClientes((prev) => prev.map((x) => (x.telefone === c.telefone ? { ...x, valorMensal: v } : x)))}
-              />
-              <PacoteCortes
-                pagos={c.cortesPagosMes}
-                usados={c.cortesUsadosMes}
-                onChangePagos={(v) => setClientes((prev) => prev.map((x) => (x.telefone === c.telefone ? { ...x, cortesPagosMes: v } : x)))}
-                onChangeUsados={(v) => setClientes((prev) => prev.map((x) => (x.telefone === c.telefone ? { ...x, cortesUsadosMes: v } : x)))}
-              />
-            </>
-          )}
+            {c.mensal && (
+              <>
+                <CampoValorMensal valor={c.valorMensal} onChange={(v) => alterar(c.telefone, { valorMensal: v })} />
+                <PacoteCortes
+                  pagos={c.cortesPagosMes}
+                  usados={c.cortesUsadosMes}
+                  onChangePagos={(v) => alterar(c.telefone, { cortesPagosMes: v })}
+                  onChangeUsados={(v) => alterar(c.telefone, { cortesUsadosMes: v })}
+                />
+              </>
+            )}
 
-          <button className="btn-salvar-cliente" onClick={() => salvar(c)}>
-            Salvar
-          </button>
-        </div>
-      ))}
+            <button type="button" className="btn btn-principal btn-bloco" onClick={() => salvar(c)}>
+              Salvar
+            </button>
+          </article>
+        ))}
+      </div>
     </div>
   )
 }

@@ -1,47 +1,49 @@
-import { useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { barberSession } from '../services/barberSession'
+import { Marca } from './Marca'
+import { IconeAgenda, IconeBloqueio, IconeClientes } from './Icones'
 
 const ITENS = [
-  { path: '/painel', label: 'Agenda' },
-  { path: '/painel/clientes', label: 'Clientes' },
-  { path: '/painel/bloqueios', label: 'Bloqueios' },
+  { path: '/painel', label: 'Agenda', icone: <IconeAgenda /> },
+  { path: '/painel/clientes', label: 'Clientes', icone: <IconeClientes /> },
+  { path: '/painel/bloqueios', label: 'Bloqueios', icone: <IconeBloqueio /> },
 ]
 
-// Menu hamburguer à esquerda (troca de seção) + título da seção ativa à
-// direita — usado no topo das 3 telas do painel do barbeiro.
+// Cabeçalho do painel (marca, sair e título da seção) e barra de abas fixa
+// embaixo, no alcance do polegar. Usado nas 3 telas do barbeiro.
 export function PainelNav({ titulo }: { titulo: string }) {
-  const [aberto, setAberto] = useState(false)
   const location = useLocation()
+  const navigate = useNavigate()
+
+  function sair() {
+    barberSession.clear()
+    navigate('/painel/entrar')
+  }
 
   return (
-    <div className="topo-painel">
-      <div className="painel-menu">
-        <button className="painel-hamburguer" onClick={() => setAberto((v) => !v)} aria-label="Abrir menu">
-          <span />
-          <span />
-          <span />
+    <>
+      <header className="topo">
+        <Marca />
+        <button type="button" className="sair" onClick={sair}>
+          Sair
         </button>
+      </header>
 
-        {aberto && (
-          <>
-            <div className="painel-menu-fundo" onClick={() => setAberto(false)} />
-            <nav className="painel-menu-lista">
-              {ITENS.map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={location.pathname === item.path ? 'painel-menu-item ativo' : 'painel-menu-item'}
-                  onClick={() => setAberto(false)}
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
-          </>
-        )}
-      </div>
+      <h1 className="painel-titulo">{titulo}</h1>
 
-      <h1>{titulo}</h1>
-    </div>
+      <nav className="abas" aria-label="Seções do painel">
+        <div className="abas-lista">
+          {ITENS.map((item) => {
+            const ativo = location.pathname === item.path
+            return (
+              <Link key={item.path} to={item.path} className={ativo ? 'aba ativo' : 'aba'} aria-current={ativo ? 'page' : undefined}>
+                {item.icone}
+                {item.label}
+              </Link>
+            )
+          })}
+        </div>
+      </nav>
+    </>
   )
 }

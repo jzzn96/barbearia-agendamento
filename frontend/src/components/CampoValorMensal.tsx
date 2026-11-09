@@ -11,6 +11,7 @@ export function CampoValorMensal({ valor, onChange }: { valor: number; onChange:
           min={0}
           step="0.01"
           inputMode="decimal"
+          aria-label="Valor mensal em reais"
           value={valor === 0 ? '' : valor}
           placeholder="0,00"
           onChange={(e) => onChange(Math.max(0, Number(e.target.value) || 0))}

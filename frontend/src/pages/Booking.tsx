@@ -2,16 +2,22 @@ import { useEffect, useMemo, useState } from 'react'
 import { api, ApiError } from '../services/api'
 import { formatPhoneInput, isValidPhone } from '../lib/phone'
 import { SERVICOS, type ServicoId } from '../lib/servicos'
+import { BARBEARIA } from '../lib/barbearia'
+import { capitalizar, dataCurta, deYMD, paraYMD } from '../lib/datas'
 import { Marca } from '../components/Marca'
+import { IconeCheck, IconePino, IconeRelogio, IconeWhats } from '../components/Icones'
 
-function proximosDias(qtd: number): { valor: string; label: string }[] {
+function proximosDias(qtd: number): { valor: string; semana: string; numero: string; mes: string }[] {
   const dias = []
   for (let i = 0; i < qtd; i++) {
     const d = new Date()
     d.setDate(d.getDate() + i)
-    const valor = d.toISOString().slice(0, 10)
-    const label = d.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' })
-    dias.push({ valor, label })
+    dias.push({
+      valor: paraYMD(d),
+      semana: d.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', ''),
+      numero: String(d.getDate()),
+      mes: d.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', ''),
+    })
   }
   return dias
 }
@@ -44,7 +50,7 @@ export default function Booking() {
   async function confirmar() {
     if (!horarioEscolhido) return
     if (!nome.trim() || !isValidPhone(telefone)) {
-      setErro('Preencha nome e um telefone válido.')
+      setErro('Preencha o nome e um telefone válido, com DDD.')
       return
     }
 
@@ -69,101 +75,183 @@ export default function Booking() {
     }
   }
 
-  const servico = SERVICOS.find((s) => s.id === servicoEscolhido)!
+  function novoAgendamento() {
+    setHorarioEscolhido(null)
+    setEtapa('escolher-horario')
+    setErro('')
+    api.horariosDisponiveis(dataEscolhida, servicoEscolhido).then(setHorarios).catch(() => {})
+  }
 
-  if (etapa === 'sucesso') {
+  const servico = SERVICOS.find((s) => s.id === servicoEscolhido)!
+  const diaEscolhido = capitalizar(deYMD(dataEscolhida).toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' }))
+
+  if (etapa === 'sucesso' && horarioEscolhido) {
+    const mensagemWhats = encodeURIComponent(
+      `Olá! Acabei de agendar ${servico.nome} para ${dataCurta(dataEscolhida)} às ${horarioEscolhido}. Meu nome é ${nome.trim()}.`,
+    )
+
     return (
-      <div className="tela">
-        <Marca />
-        <div className="sucesso">
-          <div className="sucesso-icone">✓</div>
-          <h1>Agendado!</h1>
-          <p className="card-sub">
-            {servico.nome} — {new Date(`${dataEscolhida}T00:00:00`).toLocaleDateString('pt-BR')} às {horarioEscolhido}.
-          </p>
-        </div>
+      <div className="app">
+        <header className="topo">
+          <Marca />
+        </header>
+
+        <section className="sucesso" aria-live="polite">
+          <div className="sucesso-selo">
+            <IconeCheck tamanho={30} />
+          </div>
+          <p className="eyebrow">Horário confirmado</p>
+          <h1 className="titulo-hero">
+            Te esperamos, <em>{nome.trim().split(' ')[0]}</em>
+          </h1>
+
+          <div className="sucesso-resumo">
+            <dl>
+              <dt>Serviço</dt>
+              <dd>{servico.nome}</dd>
+              <dt>Dia</dt>
+              <dd>{diaEscolhido}</dd>
+              <dt>Horário</dt>
+              <dd>{horarioEscolhido}</dd>
+              <dt>Local</dt>
+              <dd>{BARBEARIA.endereco}</dd>
+            </dl>
+          </div>
+
+          <div className="sucesso-acoes">
+            <a className="btn btn-whats btn-bloco" href={`https://wa.me/${BARBEARIA.whatsapp}?text=${mensagemWhats}`} target="_blank" rel="noreferrer">
+              <IconeWhats /> Avisar no WhatsApp
+            </a>
+            <button type="button" className="btn btn-contorno btn-bloco" onClick={novoAgendamento}>
+              Fazer outro agendamento
+            </button>
+          </div>
+        </section>
       </div>
     )
   }
 
+  const mostrandoForm = (etapa === 'form' || etapa === 'enviando' || etapa === 'erro') && horarioEscolhido
+
   return (
-    <div className="tela">
-      <Marca />
+    <div className="app">
+      <header className="topo">
+        <Marca />
+      </header>
 
-      <div className="hero">
-        <div className="hero-avatar">💈</div>
-        <div>
-          <p className="hero-titulo">Agende seu horário</p>
-          <p className="hero-sub">Escolha o serviço, o dia e o horário que preferir</p>
+      <section className="abertura">
+        <p className="eyebrow">{BARBEARIA.cidade}</p>
+        <h1 className="titulo-hero">
+          Agende seu <em>horário</em>
+        </h1>
+        <p className="lead">Escolha o serviço, o dia e o horário. A confirmação é imediata.</p>
+      </section>
+
+      <section className="passo" aria-labelledby="passo-servico">
+        <h2 className="passo-titulo" id="passo-servico">
+          <span className="passo-num">1</span> Serviço
+        </h2>
+        <div className="servicos">
+          {SERVICOS.map((s) => (
+            <button
+              key={s.id}
+              type="button"
+              className={s.id === servicoEscolhido ? 'servico ativo' : 'servico'}
+              aria-pressed={s.id === servicoEscolhido}
+              onClick={() => setServicoEscolhido(s.id)}
+            >
+              <span className="servico-nome">{s.nome}</span>
+              <span className="servico-dur">{s.duracaoMin} min</span>
+            </button>
+          ))}
         </div>
-      </div>
+      </section>
 
-      <h2>Escolha o serviço</h2>
-      <div className="chips">
-        {SERVICOS.map((s) => (
-          <button
-            key={s.id}
-            className={s.id === servicoEscolhido ? 'chip chip-ativo' : 'chip'}
-            onClick={() => setServicoEscolhido(s.id)}
-          >
-            {s.nome} · {s.duracaoMin} min
-          </button>
-        ))}
-      </div>
+      <section className="passo" aria-labelledby="passo-dia">
+        <h2 className="passo-titulo" id="passo-dia">
+          <span className="passo-num">2</span> Dia
+        </h2>
+        <div className="dias">
+          {dias.map((d) => (
+            <button
+              key={d.valor}
+              type="button"
+              className={d.valor === dataEscolhida ? 'dia ativo' : 'dia'}
+              aria-pressed={d.valor === dataEscolhida}
+              onClick={() => setDataEscolhida(d.valor)}
+            >
+              <span className="dia-sem">{d.semana}</span>
+              <span className="dia-num">{d.numero}</span>
+              <span className="dia-mes">{d.mes}</span>
+            </button>
+          ))}
+        </div>
+      </section>
 
-      <h2>Escolha o dia</h2>
-      <div className="chips">
-        {dias.map((d) => (
-          <button
-            key={d.valor}
-            className={d.valor === dataEscolhida ? 'chip chip-ativo' : 'chip'}
-            onClick={() => setDataEscolhida(d.valor)}
-          >
-            {d.label}
-          </button>
-        ))}
-      </div>
+      <section className="passo" aria-labelledby="passo-horario">
+        <h2 className="passo-titulo" id="passo-horario">
+          <span className="passo-num">3</span> Horário
+        </h2>
+        {carregandoHorarios && <p className="aviso">Buscando horários livres...</p>}
+        {!carregandoHorarios && erro && etapa === 'escolher-horario' && <p className="erro">{erro}</p>}
+        {!carregandoHorarios && !erro && horarios.length === 0 && <p className="aviso">Sem horários livres nesse dia. Escolha outro dia.</p>}
+        <div className="horarios">
+          {horarios.map((h) => (
+            <button
+              key={h}
+              type="button"
+              className={h === horarioEscolhido ? 'horario ativo' : 'horario'}
+              aria-pressed={h === horarioEscolhido}
+              onClick={() => {
+                setHorarioEscolhido(h)
+                setEtapa('form')
+              }}
+            >
+              {h}
+            </button>
+          ))}
+        </div>
+      </section>
 
-      <h2>Horários disponíveis</h2>
-      {carregandoHorarios && <p>Carregando...</p>}
-      {!carregandoHorarios && erro && etapa === 'escolher-horario' && <p className="erro">{erro}</p>}
-      {!carregandoHorarios && !erro && horarios.length === 0 && <p>Sem horários livres nesse dia.</p>}
-      <div className="chips">
-        {horarios.map((h) => (
-          <button
-            key={h}
-            className={h === horarioEscolhido ? 'chip chip-ativo' : 'chip'}
-            onClick={() => {
-              setHorarioEscolhido(h)
-              setEtapa('form')
-            }}
-          >
-            {h}
-          </button>
-        ))}
-      </div>
-
-      {(etapa === 'form' || etapa === 'enviando' || etapa === 'erro') && horarioEscolhido && (
-        <div className="form">
-          <h2 style={{ marginTop: 0 }}>Seus dados</h2>
-          <p className="card-sub" style={{ marginTop: -6 }}>
-            {servico.nome} · {new Date(`${dataEscolhida}T00:00:00`).toLocaleDateString('pt-BR')} às {horarioEscolhido}
+      {mostrandoForm && (
+        <section className="dados" aria-labelledby="passo-dados">
+          <h2 className="passo-titulo" id="passo-dados" style={{ marginBottom: 0 }}>
+            <span className="passo-num">4</span> Seus dados
+          </h2>
+          <p className="resumo-escolha">
+            <IconeRelogio tamanho={18} />
+            <span>
+              {servico.nome} · {diaEscolhido} às {horarioEscolhido}
+            </span>
           </p>
-          <label htmlFor="campo-nome">Nome</label>
-          <input id="campo-nome" placeholder="Seu nome" value={nome} onChange={(e) => setNome(e.target.value)} />
-          <label htmlFor="campo-telefone">Telefone</label>
-          <input
-            id="campo-telefone"
-            placeholder="(11) 91234-5678"
-            value={telefone}
-            onChange={(e) => setTelefone(formatPhoneInput(e.target.value))}
-          />
+
+          <div className="campo">
+            <label htmlFor="campo-nome">Nome</label>
+            <input id="campo-nome" autoComplete="name" placeholder="Como podemos te chamar?" value={nome} onChange={(e) => setNome(e.target.value)} />
+          </div>
+          <div className="campo">
+            <label htmlFor="campo-telefone">WhatsApp</label>
+            <input
+              id="campo-telefone"
+              type="tel"
+              inputMode="tel"
+              autoComplete="tel-national"
+              placeholder="(47) 99999-9999"
+              value={telefone}
+              onChange={(e) => setTelefone(formatPhoneInput(e.target.value))}
+            />
+          </div>
           {erro && <p className="erro">{erro}</p>}
-          <button disabled={etapa === 'enviando'} onClick={confirmar}>
+          <button type="button" className="btn btn-principal btn-bloco" disabled={etapa === 'enviando'} onClick={confirmar}>
             {etapa === 'enviando' ? 'Confirmando...' : 'Confirmar agendamento'}
           </button>
-        </div>
+        </section>
       )}
+
+      <footer className="rodape">
+        <IconePino tamanho={18} />
+        <span>{BARBEARIA.endereco}</span>
+      </footer>
     </div>
   )
 }
